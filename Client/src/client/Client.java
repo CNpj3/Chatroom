@@ -131,7 +131,7 @@ public class Client extends javax.swing.JFrame {
             InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
             reader = new BufferedReader(streamreader);
             writer = new PrintWriter(socket.getOutputStream());
-            writer.println("LOGIN");
+            writer.println("LOG");
             writer.println(username);
             writer.println(password);
             // writer.println(username + "has connected.");

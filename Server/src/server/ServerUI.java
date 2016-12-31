@@ -20,6 +20,7 @@ public class ServerUI extends javax.swing.JFrame {
      * Creates new form ServerUI
      */
     Map<String,String> user_pass = new HashMap<String,String>();
+    PrintWriter user_pass_edit;
     public ServerUI() {
         initComponents();
     }
@@ -35,20 +36,21 @@ public class ServerUI extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         screen = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
+        server_start_button = new javax.swing.JButton();
         port_num = new javax.swing.JTextField();
         port = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         screen.setColumns(20);
         screen.setRows(5);
         jScrollPane1.setViewportView(screen);
 
-        jButton1.setText("server start");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        server_start_button.setText("server start");
+        server_start_button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                server_start_buttonActionPerformed(evt);
             }
         });
 
@@ -71,7 +73,7 @@ public class ServerUI extends javax.swing.JFrame {
                                 .addGap(67, 67, 67)
                                 .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(128, 128, 128)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(35, 35, 35)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -89,7 +91,7 @@ public class ServerUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(37, 37, 37)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(44, 44, 44))
         );
 
@@ -134,25 +136,31 @@ public class ServerUI extends javax.swing.JFrame {
                 screen.append("one client connected\n");
                 while((op = reader.readLine()) != null){
                     screen.append("recv op: "+op+"\n" );
-                    if(op.equals("LOGIN")){
+                    if(op.equals("LOG")){
                         String user = reader.readLine();
                         String pass = reader.readLine();
                         
                         //if(user.equals("user") && pass.equals("pass")){
-                        if(login_verify(user,pass)){
-                            writer.println("ok");
-                            writer.flush();
-                        }
+                        if(login_verify(user,pass)) writer.println("ok");                        
+                        else writer.println("fail");
+                        writer.flush();
+                    }
+                    else if (op.equals("REG")) {                        
+                        String user = reader.readLine();
+                        String pass = reader.readLine();
+                        if(user_pass.containsKey(user)) writer.println("fail");
                         else{
-                            writer.println("fail");
-                            writer.flush();
+                            user_pass.put(user,pass);
+                            writer.println("ok");
+                            user_pass_edit.println(user+" "+pass);
+                            user_pass_edit.flush();
                         }
-                        
-                        
+                        writer.flush();
                     }
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
+                screen.append("lost a connection\n");
+                //Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         private boolean login_verify(String user, String pass){
@@ -171,11 +179,14 @@ public class ServerUI extends javax.swing.JFrame {
             user_pass.put(parts[0],parts[1]);
             screen.append("user:"+parts[0]+" pass:"+ user_pass.get(parts[0])+"\n");
         }
+       
+        user_pass_edit = new PrintWriter(new BufferedWriter(new FileWriter(yourFile,true)));
+        user_pass_edit.println("");
     // line is not visible here.
     }
 
     
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void server_start_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_server_start_buttonActionPerformed
         try {
             read_login_file();
         } catch (IOException ex) {
@@ -183,7 +194,8 @@ public class ServerUI extends javax.swing.JFrame {
         }
         Thread serv = new Thread(new Server());
         serv.start();
-    }//GEN-LAST:event_jButton1ActionPerformed
+        server_start_button.setEnabled(false);
+    }//GEN-LAST:event_server_start_buttonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,10 +233,10 @@ public class ServerUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel port;
     private javax.swing.JTextField port_num;
     private javax.swing.JTextArea screen;
+    private javax.swing.JButton server_start_button;
     // End of variables declaration//GEN-END:variables
 }

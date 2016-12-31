@@ -98,11 +98,14 @@ public class ClientRegister extends javax.swing.JFrame {
 
         // do register
         try {
-            socket = new Socket();
+            socket = new Socket("localhost",2222);
             InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
             reader = new BufferedReader(streamreader);
             writer = new PrintWriter(socket.getOutputStream());
             // writer.println(username + "has connected.");
+            writer.println("REG");
+            writer.println(username);
+            writer.println(password);
             writer.flush();
             
             String isConnect = reader.readLine();
@@ -114,7 +117,7 @@ public class ClientRegister extends javax.swing.JFrame {
                 chatroom.setVisible(true);
             }
             else {
-                JOptionPane.showMessageDialog(null, "Login Failed.");
+                JOptionPane.showMessageDialog(null, "Register Failed.");
             }
         }
         catch (Exception e){
