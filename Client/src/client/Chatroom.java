@@ -8,6 +8,8 @@ package client;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -160,8 +162,12 @@ public class Chatroom extends javax.swing.JFrame {
     }//GEN-LAST:event_onlineUserListActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        // Logout
-        socket.close();
+        try {
+            // Logout
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
+        }
         JOptionPane.showMessageDialog(null, "Disconnected successfully.");
     }//GEN-LAST:event_logoutActionPerformed
 

@@ -19,6 +19,7 @@ public class ServerUI extends javax.swing.JFrame {
     /**
      * Creates new form ServerUI
      */
+    Map<String,String> user_pass = new HashMap<String,String>();
     public ServerUI() {
         initComponents();
     }
@@ -50,6 +51,8 @@ public class ServerUI extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        port_num.setText("2222");
 
         port.setText("port");
 
@@ -99,36 +102,87 @@ public class ServerUI extends javax.swing.JFrame {
             try {
                 int num = Integer.parseInt(port_num.getText());
                 ServerSocket ssock = new ServerSocket(num);
-                screen.append("server now listen on port "+num);
+                screen.append("server now listen on port "+num+"\n");
                 while(true){
                     Socket listen = ssock.accept();
-                    DataOutputStream writer = new DataOutputStream(listen.getOutputStream());
+                    //PrintWriter writer = new PrintWriter(listen.getOutputStream());
                     //todo: add writer to list
                     Thread listener = new Thread(new Handler(listen));
-                    listener.run();
+                    listener.start();
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+            }            
         }
     }
     
     public class Handler implements Runnable{
         Socket client;
-        public Handler(Socket in){
+        BufferedReader reader;
+        PrintWriter writer;
+        public Handler(Socket in) throws IOException{
             client = in;
+            InputStreamReader isReader = new InputStreamReader(client.getInputStream());
+            reader = new BufferedReader(isReader);
+            writer = new PrintWriter(client.getOutputStream());
         }
         @Override
         public void run(){
-            screen.append("one client connected\n");
+            try {
+                String[] data;
+                String op;
+                screen.append("one client connected\n");
+                while((op = reader.readLine()) != null){
+                    screen.append("recv op: "+op+"\n" );
+                    if(op.equals("LOGIN")){
+                        String user = reader.readLine();
+                        String pass = reader.readLine();
+                        
+                        //if(user.equals("user") && pass.equals("pass")){
+                        if(login_verify(user,pass)){
+                            writer.println("ok");
+                            writer.flush();
+                        }
+                        else{
+                            writer.println("fail");
+                            writer.flush();
+                        }
+                        
+                        
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        private boolean login_verify(String user, String pass){
+            return (pass.equals(user_pass.get(user)));
         }
     }
-    
+   
+    public void read_login_file() throws IOException{
+        File yourFile = new File("login.txt");
+        String[] parts;
+        yourFile.createNewFile(); // if file already exists will do nothing 
+        BufferedReader br = new BufferedReader(new FileReader(yourFile));
+        for(String line; (line = br.readLine()) != null; ) {
+            // process the line.
+            parts = line.split(" ");
+            user_pass.put(parts[0],parts[1]);
+            screen.append("user:"+parts[0]+" pass:"+ user_pass.get(parts[0])+"\n");
+        }
+    // line is not visible here.
+    }
+
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Thread ser = new Thread(new Server());
-        ser.start();
+        try {
+            read_login_file();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Thread serv = new Thread(new Server());
+        serv.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

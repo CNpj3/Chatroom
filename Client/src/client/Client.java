@@ -127,10 +127,11 @@ public class Client extends javax.swing.JFrame {
         
         // login by socket
         try {          
-            socket = new Socket();
+            socket = new Socket("localhost",2222);
             InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
             reader = new BufferedReader(streamreader);
             writer = new PrintWriter(socket.getOutputStream());
+            writer.println("LOGIN");
             writer.println(username);
             writer.println(password);
             // writer.println(username + "has connected.");
