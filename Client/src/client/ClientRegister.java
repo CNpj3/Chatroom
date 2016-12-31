@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package client;
-
 import javax.swing.*;
 import java.awt.*;
 import java.net.*;
@@ -15,14 +14,14 @@ import java.util.*;
  *
  * @author MuYu
  */
-public class Client extends javax.swing.JFrame {
+public class ClientRegister extends javax.swing.JFrame {
 
     String username, password;
     Socket socket;
     BufferedReader reader;
     PrintWriter writer;
     
-    public Client() {
+    public ClientRegister() {
         initComponents();
     }
 
@@ -37,29 +36,21 @@ public class Client extends javax.swing.JFrame {
 
         userInput = new javax.swing.JTextField();
         passInput = new javax.swing.JTextField();
-        loginButton = new javax.swing.JButton();
         registerButton = new javax.swing.JButton();
         User = new javax.swing.JLabel();
         Pass = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        loginButton.setText("Login");
-        loginButton.setToolTipText("");
-        loginButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loginButtonActionPerformed(evt);
-            }
-        });
-
-        registerButton.setText("Haven't An Accont? Register!");
+        registerButton.setText("Register");
+        registerButton.setToolTipText("");
         registerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 registerButtonActionPerformed(evt);
             }
         });
 
-        User.setText("Username");
+        User.setText("User");
 
         Pass.setText("Password");
 
@@ -68,19 +59,16 @@ public class Client extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(123, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(registerButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Pass)
-                            .addComponent(User))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(passInput)
-                            .addComponent(userInput, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(9, 9, 9)
-                        .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(126, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Pass)
+                    .addComponent(User))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(passInput)
+                    .addComponent(userInput, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addComponent(registerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(111, 111, 111))
         );
         layout.setVerticalGroup(
@@ -97,46 +85,27 @@ public class Client extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(Pass)
                             .addComponent(passInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(registerButton)
-                .addContainerGap(139, Short.MAX_VALUE))
+                    .addComponent(registerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+    private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         username = userInput.getText();
         password = passInput.getText();
-        
-        /* test login
-        if (username.equals("user") && password.equals("pass")) {
-            try {
-                JOptionPane.showMessageDialog(null, "you are successfully login.");
-               Chatroom chatroom = new Chatroom();
-                chatroom.getAccount(username, password);
-                this.dispose();
-                chatroom.setVisible(true);
-            }
-            catch (Exception e){
 
-            }
-        }
-        */
-        
-        // login by socket
-        try {          
+        // do register
+        try {
             socket = new Socket();
             InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
             reader = new BufferedReader(streamreader);
             writer = new PrintWriter(socket.getOutputStream());
-            writer.println(username);
-            writer.println(password);
             // writer.println(username + "has connected.");
             writer.flush();
+            
             String isConnect = reader.readLine();
-
             if (isConnect.equals("ok")) {
                 JOptionPane.showMessageDialog(null, "You are successfully login.");
                 Chatroom chatroom = new Chatroom();
@@ -151,25 +120,9 @@ public class Client extends javax.swing.JFrame {
         catch (Exception e){
 
         }
-    }//GEN-LAST:event_loginButtonActionPerformed
 
-    private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
-        try {
-            ClientRegister clientRegister = new ClientRegister();
-            clientRegister.setVisible(true);
-        }
-        catch (Exception e) {
-            
-        }
     }//GEN-LAST:event_registerButtonActionPerformed
 
-    public String getusername() {
-        return username;
-    }
-    public String getpassword() {
-        return password;
-    }
-    
      
 
     
@@ -190,23 +143,25 @@ public class Client extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientRegister.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
-        Client client = new Client();
+        ClientRegister client = new ClientRegister();
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Client().setVisible(true);
+                new ClientRegister().setVisible(true);
             }
         });
     }
@@ -214,7 +169,6 @@ public class Client extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Pass;
     private javax.swing.JLabel User;
-    private javax.swing.JButton loginButton;
     private javax.swing.JTextField passInput;
     private javax.swing.JButton registerButton;
     private javax.swing.JTextField userInput;
