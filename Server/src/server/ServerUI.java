@@ -275,6 +275,7 @@ public class ServerUI extends javax.swing.JFrame {
             InputStreamReader isReader = new InputStreamReader(client.getInputStream());
             reader = new BufferedReader(isReader);
             writer = new PrintWriter(client.getOutputStream());
+            writer.flush();
         }
         @Override
         public void run(){
@@ -314,28 +315,43 @@ public class ServerUI extends javax.swing.JFrame {
                             user_pass_edit.flush();
                         }
                         writer.flush();
+                        send_UL_to_all();
+                        user_socket.put(user,client);                        
                     }
                     else if (op.equals("DIS")) {
                         user_status.put(user,false);
                         break;
                     }
-                    else if(op.equals("FL")){
-                        
+                    else if(op.equals("UL")){
+                        send_UL(writer);
                     }
                 }
             } catch (IOException ex) {
                 if(user_status.containsKey(user)){
                     user_status.put(user,false);
                 }
-                screen.append("lost a connection\n");
                 //Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }            
+            screen.append("lost a connection\n");
         }
         private boolean login_verify(String user, String pass){
             return (pass.equals(user_pass.get(user)));
+        }        
+    }
+    public void send_UL_to_all() throws IOException{
+        for(Map.Entry<String,Socket> entry: user_socket.entrySet()){
+            PrintWriter wr = new PrintWriter(entry.getValue().getOutputStream());
+            send_UL(wr);
         }
     }
-   
+    public void send_UL(PrintWriter wr){
+        wr.println("UL");
+        wr.println(user_status.size());
+        for(Map.Entry<String,Boolean> entry: user_status.entrySet()){
+            wr.println(entry.getKey());
+        }
+        wr.flush();
+    }
     public void read_login_file() throws IOException{
         File yourFile = new File("./data/login.txt");
         String[] parts;

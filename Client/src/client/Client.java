@@ -146,10 +146,12 @@ public class Client extends javax.swing.JFrame {
 
             if (isConnect.equals("ok")) {
                 JOptionPane.showMessageDialog(null, "You are successfully login.");
+                send_UL_request();
                 Chatroom chatroom = new Chatroom();
                 chatroom.getAccount(socket, username, password);
                 this.dispose();
                 chatroom.setVisible(true);
+                chatroom.listen();
             }
             else {
                 JOptionPane.showMessageDialog(null, "Login Failed.");
@@ -163,13 +165,17 @@ public class Client extends javax.swing.JFrame {
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         try {
             ClientRegister clientRegister = new ClientRegister();
+            this.dispose();
             clientRegister.setVisible(true);
         }
         catch (Exception e) {
             
         }
     }//GEN-LAST:event_registerButtonActionPerformed
-
+    public void send_UL_request(){
+        writer.println("UL");
+        writer.flush();
+    }
     public String getusername() {
         return username;
     }
@@ -213,7 +219,7 @@ public class Client extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Client().setVisible(true);
+                client.setVisible(true);
             }
         });
     }

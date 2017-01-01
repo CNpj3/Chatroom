@@ -112,9 +112,11 @@ public class ClientRegister extends javax.swing.JFrame {
             if (isConnect.equals("ok")) {
                 JOptionPane.showMessageDialog(null, "You are successfully login.");
                 Chatroom chatroom = new Chatroom();
+                send_UL_request();
                 chatroom.getAccount(socket, username, password);
                 this.dispose();
                 chatroom.setVisible(true);
+                chatroom.listen();
             }
             else {
                 JOptionPane.showMessageDialog(null, "Register Failed.");
@@ -126,7 +128,10 @@ public class ClientRegister extends javax.swing.JFrame {
 
     }//GEN-LAST:event_registerButtonActionPerformed
 
-     
+    public void send_UL_request(){
+        writer.println("UL");
+        writer.flush();
+    } 
 
     
     /**
