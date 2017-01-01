@@ -7,6 +7,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.swing.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +21,8 @@ public class ServerUI extends javax.swing.JFrame {
      * Creates new form ServerUI
      */
     Map<String,String> user_pass = new HashMap<String,String>();
-    Map<String,Boolean>user_status = new HashMap<String,Boolean>();
+    Map<String,Boolean> user_status = new HashMap<String,Boolean>();
+    Map<String,Socket> user_socket = new HashMap<String,Socket>();
     PrintWriter user_pass_edit;
     public ServerUI() {
         initComponents();
@@ -54,6 +56,7 @@ public class ServerUI extends javax.swing.JFrame {
         refresh = new java.awt.Button();
         jScrollPane3 = new javax.swing.JScrollPane();
         online_user_plane = new javax.swing.JTextArea();
+        clear_board = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -139,11 +142,13 @@ public class ServerUI extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("CN Line Server");
+        setLocationByPlatform(true);
         setResizable(false);
 
+        screen.setEditable(false);
         screen.setColumns(20);
         screen.setRows(5);
-        screen.setEnabled(false);
         jScrollPane1.setViewportView(screen);
 
         server_start_button.setText("server start");
@@ -157,7 +162,7 @@ public class ServerUI extends javax.swing.JFrame {
 
         port.setText("port");
 
-        online_user_label.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+        online_user_label.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         online_user_label.setText("Online Users");
 
         refresh.setLabel("refresh");
@@ -167,13 +172,20 @@ public class ServerUI extends javax.swing.JFrame {
             }
         });
 
+        online_user_plane.setEditable(false);
         online_user_plane.setColumns(20);
         online_user_plane.setFont(new java.awt.Font("Monospaced", 0, 16)); // NOI18N
         online_user_plane.setRows(5);
         online_user_plane.setText("(none)");
         online_user_plane.setAutoscrolls(false);
-        online_user_plane.setEnabled(false);
         jScrollPane3.setViewportView(online_user_plane);
+
+        clear_board.setText("clear");
+        clear_board.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clear_boardActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -184,27 +196,32 @@ public class ServerUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(port)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(66, 66, 66)
-                        .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(clear_board, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(online_user_label, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(0, 12, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(online_user_label, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGap(12, 15, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(60, 60, 60)
-                        .addComponent(online_user_label, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(45, 45, 45)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(online_user_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -212,11 +229,12 @@ public class ServerUI extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(port)
                         .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(clear_board, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -238,7 +256,8 @@ public class ServerUI extends javax.swing.JFrame {
                     listener.start();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "Server Failed.");
+                System.exit(0);
             }            
         }
     }
@@ -273,6 +292,7 @@ public class ServerUI extends javax.swing.JFrame {
                         if(login_verify(user,pass) && (!user_status.get(user))){
                             writer.println("ok");
                             user_status.put(user,true);
+                            user_socket.put(user,client);
                         }                        
                         else {
                             writer.println("fail");
@@ -295,6 +315,13 @@ public class ServerUI extends javax.swing.JFrame {
                         }
                         writer.flush();
                     }
+                    else if (op.equals("DIS")) {
+                        user_status.put(user,false);
+                        break;
+                    }
+                    else if(op.equals("FL")){
+                        
+                    }
                 }
             } catch (IOException ex) {
                 if(user_status.containsKey(user)){
@@ -310,7 +337,7 @@ public class ServerUI extends javax.swing.JFrame {
     }
    
     public void read_login_file() throws IOException{
-        File yourFile = new File("login.txt");
+        File yourFile = new File("./data/login.txt");
         String[] parts;
         yourFile.createNewFile(); // if file already exists will do nothing 
         BufferedReader br = new BufferedReader(new FileReader(yourFile));
@@ -320,7 +347,6 @@ public class ServerUI extends javax.swing.JFrame {
             user_pass.put(parts[0],parts[1]);
             screen.append("user:"+parts[0]+",pass:"+ user_pass.get(parts[0])+"\n");
         }
-       
         user_pass_edit = new PrintWriter(new BufferedWriter(new FileWriter(yourFile,true)));
     // line is not visible here.
     }
@@ -341,7 +367,7 @@ public class ServerUI extends javax.swing.JFrame {
         serv.start();
         server_start_button.setEnabled(false);
     }//GEN-LAST:event_server_start_buttonActionPerformed
-
+    
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
         // TODO add your handling code here:
         online_user_plane.setText("");
@@ -354,6 +380,11 @@ public class ServerUI extends javax.swing.JFrame {
         }
         if(none) online_user_plane.setText("(none)");
     }//GEN-LAST:event_refreshActionPerformed
+
+    private void clear_boardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_boardActionPerformed
+        // TODO add your handling code here:
+        screen.setText("");
+    }//GEN-LAST:event_clear_boardActionPerformed
 
     /**
      * @param args the command line arguments
@@ -391,6 +422,7 @@ public class ServerUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clear_board;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;
     private javax.swing.JFrame jFrame3;
