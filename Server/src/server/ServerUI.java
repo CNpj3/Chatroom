@@ -152,8 +152,8 @@ public class ServerUI extends javax.swing.JFrame {
                         else{
                             user_pass.put(user,pass);
                             writer.println("ok");
-                            user_pass_edit.println("");
-                            user_pass_edit.print(user+" "+pass);
+                            //user_pass_edit.println("");
+                            user_pass_edit.println(user+" "+pass);
                             user_pass_edit.flush();
                         }
                         writer.flush();
