@@ -20,6 +20,7 @@ public class ServerUI extends javax.swing.JFrame {
      * Creates new form ServerUI
      */
     Map<String,String> user_pass = new HashMap<String,String>();
+    Map<String,Boolean>user_status = new HashMap<String,Boolean>();
     PrintWriter user_pass_edit;
     public ServerUI() {
         initComponents();
@@ -34,17 +35,115 @@ public class ServerUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jFrame1 = new javax.swing.JFrame();
+        jInternalFrame1 = new javax.swing.JInternalFrame();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jFrame2 = new javax.swing.JFrame();
+        popupMenu1 = new java.awt.PopupMenu();
+        popupMenu2 = new java.awt.PopupMenu();
+        jFrame3 = new javax.swing.JFrame();
+        jFrame4 = new javax.swing.JFrame();
+        jFrame5 = new javax.swing.JFrame();
         jScrollPane1 = new javax.swing.JScrollPane();
         screen = new javax.swing.JTextArea();
         server_start_button = new javax.swing.JButton();
         port_num = new javax.swing.JTextField();
         port = new javax.swing.JLabel();
+        online_user_label = new java.awt.Label();
+        refresh = new java.awt.Button();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        online_user_plane = new javax.swing.JTextArea();
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
+        jFrame1.getContentPane().setLayout(jFrame1Layout);
+        jFrame1Layout.setHorizontalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame1Layout.setVerticalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        jInternalFrame1.setVisible(true);
+
+        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
+        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
+        jInternalFrame1Layout.setHorizontalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jInternalFrame1Layout.setVerticalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jFrame2Layout = new javax.swing.GroupLayout(jFrame2.getContentPane());
+        jFrame2.getContentPane().setLayout(jFrame2Layout);
+        jFrame2Layout.setHorizontalGroup(
+            jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame2Layout.setVerticalGroup(
+            jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        popupMenu1.setLabel("popupMenu1");
+
+        popupMenu2.setLabel("popupMenu2");
+
+        javax.swing.GroupLayout jFrame3Layout = new javax.swing.GroupLayout(jFrame3.getContentPane());
+        jFrame3.getContentPane().setLayout(jFrame3Layout);
+        jFrame3Layout.setHorizontalGroup(
+            jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame3Layout.setVerticalGroup(
+            jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jFrame4Layout = new javax.swing.GroupLayout(jFrame4.getContentPane());
+        jFrame4.getContentPane().setLayout(jFrame4Layout);
+        jFrame4Layout.setHorizontalGroup(
+            jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame4Layout.setVerticalGroup(
+            jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jFrame5Layout = new javax.swing.GroupLayout(jFrame5.getContentPane());
+        jFrame5.getContentPane().setLayout(jFrame5Layout);
+        jFrame5Layout.setHorizontalGroup(
+            jFrame5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame5Layout.setVerticalGroup(
+            jFrame5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
         screen.setColumns(20);
         screen.setRows(5);
+        screen.setEnabled(false);
         jScrollPane1.setViewportView(screen);
 
         server_start_button.setText("server start");
@@ -58,41 +157,67 @@ public class ServerUI extends javax.swing.JFrame {
 
         port.setText("port");
 
+        online_user_label.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+        online_user_label.setText("Online Users");
+
+        refresh.setLabel("refresh");
+        refresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshActionPerformed(evt);
+            }
+        });
+
+        online_user_plane.setColumns(20);
+        online_user_plane.setFont(new java.awt.Font("Monospaced", 0, 16)); // NOI18N
+        online_user_plane.setRows(5);
+        online_user_plane.setText("(none)");
+        online_user_plane.setAutoscrolls(false);
+        online_user_plane.setEnabled(false);
+        jScrollPane3.setViewportView(online_user_plane);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(83, 83, 83)
-                                .addComponent(port))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(67, 67, 67)
-                                .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(128, 128, 128)
-                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(port)
+                        .addGap(18, 18, 18)
+                        .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(66, 66, 66)
+                        .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(36, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(online_user_label, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(59, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(60, 60, 60)
+                        .addComponent(online_user_label, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(port))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(37, 37, 37)
-                        .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(44, 44, 44))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(server_start_button, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(port)
+                        .addComponent(port_num, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -122,6 +247,10 @@ public class ServerUI extends javax.swing.JFrame {
         Socket client;
         BufferedReader reader;
         PrintWriter writer;
+
+        String user = "";
+        String pass = "";
+
         public Handler(Socket in) throws IOException{
             client = in;
             InputStreamReader isReader = new InputStreamReader(client.getInputStream());
@@ -137,20 +266,28 @@ public class ServerUI extends javax.swing.JFrame {
                 while((op = reader.readLine()) != null){
                     screen.append("recv op: "+op+"\n" );
                     if(op.equals("LOG")){
-                        String user = reader.readLine();
-                        String pass = reader.readLine();
+                        user = reader.readLine();
+                        pass = reader.readLine();
                         
                         //if(user.equals("user") && pass.equals("pass")){
-                        if(login_verify(user,pass)) writer.println("ok");                        
-                        else writer.println("fail");
+                        if(login_verify(user,pass) && (!user_status.get(user))){
+                            writer.println("ok");
+                            user_status.put(user,true);
+                        }                        
+                        else {
+                            writer.println("fail");
+                            user = "";
+                            pass = "";
+                        }
                         writer.flush();
                     }
                     else if (op.equals("REG")) {                        
-                        String user = reader.readLine();
-                        String pass = reader.readLine();
+                        user = reader.readLine();
+                        pass = reader.readLine();
                         if(user_pass.containsKey(user)) writer.println("fail");
                         else{
                             user_pass.put(user,pass);
+                            user_status.put(user,true);
                             writer.println("ok");
                             //user_pass_edit.println("");
                             user_pass_edit.println(user+" "+pass);
@@ -160,6 +297,9 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                 }
             } catch (IOException ex) {
+                if(user_status.containsKey(user)){
+                    user_status.put(user,false);
+                }
                 screen.append("lost a connection\n");
                 //Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -178,17 +318,22 @@ public class ServerUI extends javax.swing.JFrame {
             // process the line.
             parts = line.split(" ");
             user_pass.put(parts[0],parts[1]);
-            screen.append("user:"+parts[0]+" pass:"+ user_pass.get(parts[0])+"\n");
+            screen.append("user:"+parts[0]+",pass:"+ user_pass.get(parts[0])+"\n");
         }
        
         user_pass_edit = new PrintWriter(new BufferedWriter(new FileWriter(yourFile,true)));
     // line is not visible here.
     }
-
+    public void setup_user_status(){
+        for(Map.Entry<String,String> entry: user_pass.entrySet()){
+            user_status.put(entry.getKey(),false);
+        }
+    }
     
     private void server_start_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_server_start_buttonActionPerformed
         try {
             read_login_file();
+            setup_user_status();
         } catch (IOException ex) {
             Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -196,6 +341,19 @@ public class ServerUI extends javax.swing.JFrame {
         serv.start();
         server_start_button.setEnabled(false);
     }//GEN-LAST:event_server_start_buttonActionPerformed
+
+    private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
+        // TODO add your handling code here:
+        online_user_plane.setText("");
+        boolean none = true;
+        for(Map.Entry<String,Boolean> entry: user_status.entrySet()){
+            if(entry.getValue()){
+                none = false;
+                online_user_plane.append(entry.getKey()+"\n");
+            }
+        }
+        if(none) online_user_plane.setText("(none)");
+    }//GEN-LAST:event_refreshActionPerformed
 
     /**
      * @param args the command line arguments
@@ -233,9 +391,23 @@ public class ServerUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFrame jFrame1;
+    private javax.swing.JFrame jFrame2;
+    private javax.swing.JFrame jFrame3;
+    private javax.swing.JFrame jFrame4;
+    private javax.swing.JFrame jFrame5;
+    private javax.swing.JInternalFrame jInternalFrame1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
+    private java.awt.Label online_user_label;
+    private javax.swing.JTextArea online_user_plane;
+    private java.awt.PopupMenu popupMenu1;
+    private java.awt.PopupMenu popupMenu2;
     private javax.swing.JLabel port;
     private javax.swing.JTextField port_num;
+    private java.awt.Button refresh;
     private javax.swing.JTextArea screen;
     private javax.swing.JButton server_start_button;
     // End of variables declaration//GEN-END:variables
