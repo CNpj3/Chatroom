@@ -352,7 +352,7 @@ public class ServerUI extends javax.swing.JFrame {
             if(entry.getValue()) 
                 wr.println(entry.getKey());
         }
-        wr.println("END");
+        wr.println("\0");
         wr.flush();
     }
     public void send_UL_to_all() throws IOException{

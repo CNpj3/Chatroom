@@ -63,7 +63,7 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("OUSER")){
                         online_user_textArea.setText("");
                         op = reader.readLine();
-                        while(!(op.equals("END"))){
+                        while(!(op.equals("\0"))){
                             online_user_textArea.append(op+"\n");
                             op = reader.readLine();
                         }
