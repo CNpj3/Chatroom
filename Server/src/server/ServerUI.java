@@ -10,6 +10,7 @@ import java.util.*;
 import javax.swing.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -24,6 +25,7 @@ public class ServerUI extends javax.swing.JFrame {
     Map<String,Boolean> user_status = new HashMap<String,Boolean>();
     Map<String,Socket> user_socket = new HashMap<String,Socket>();
     PrintWriter user_pass_edit;
+
     public ServerUI() {
         initComponents();
     }
@@ -245,6 +247,9 @@ public class ServerUI extends javax.swing.JFrame {
         @Override
         public void run() {
             try {
+                
+                DefaultCaret caret = (DefaultCaret) screen.getCaret();
+                caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
                 int num = Integer.parseInt(port_num.getText());
                 ServerSocket ssock = new ServerSocket(num);
                 screen.append("server now listen on port "+num+"\n");
@@ -325,6 +330,9 @@ public class ServerUI extends javax.swing.JFrame {
                     else if(op.equals("UL")){
                         send_UL(writer);
                     }
+                    else if(op.equals("OUSER")){
+                        send_OUSER(writer);
+                    }
                 }
             } catch (IOException ex) {
                 if(user_status.containsKey(user)){
@@ -337,6 +345,15 @@ public class ServerUI extends javax.swing.JFrame {
         private boolean login_verify(String user, String pass){
             return (pass.equals(user_pass.get(user)));
         }        
+    }
+    public void send_OUSER(PrintWriter wr){
+        wr.println("OUSER");
+        for(Map.Entry<String,Boolean> entry: user_status.entrySet()){
+            if(entry.getValue()) 
+                wr.println(entry.getKey());
+        }
+        wr.println("END");
+        wr.flush();
     }
     public void send_UL_to_all() throws IOException{
         for(Map.Entry<String,Socket> entry: user_socket.entrySet()){

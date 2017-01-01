@@ -11,6 +11,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Font;
 
 /**
  *
@@ -20,10 +22,15 @@ public class Chatroom extends javax.swing.JFrame {
     Socket socket = new Socket();
     BufferedReader reader;
     PrintWriter writer;
+    javax.swing.JDialog online_user_dialog = new javax.swing.JDialog();
+    javax.swing.JTextArea online_user_textArea = new javax.swing.JTextArea();
+    
+    
     
     
     public Chatroom() {
         initComponents();
+        intiOnline_user();
     }
     public void getAccount(Socket sc, String username, String password) throws IOException {
         socket = sc;    // Does it work??
@@ -53,6 +60,14 @@ public class Chatroom extends javax.swing.JFrame {
                             userList.addItem(reader.readLine());
                         }
                     }
+                    else if(op.equals("OUSER")){
+                        online_user_textArea.setText("");
+                        op = reader.readLine();
+                        while(!(op.equals("END"))){
+                            online_user_textArea.append(op+"\n");
+                            op = reader.readLine();
+                        }
+                    }
                 }
             } catch (IOException ex) {
                 
@@ -60,7 +75,18 @@ public class Chatroom extends javax.swing.JFrame {
         }
     }
     
-    
+    private void intiOnline_user(){        
+        online_user_dialog.setSize(150,400);
+        online_user_dialog.setResizable(false);
+        online_user_textArea.setSize(150,400);
+        online_user_textArea.setEditable(false);
+        online_user_dialog.setResizable(false);
+        online_user_dialog.add(online_user_textArea);
+        online_user_dialog.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        online_user_textArea.setFont(new Font("Monospaced", Font.BOLD, 24));
+        online_user_dialog.setTitle("Online User List");
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -68,8 +94,10 @@ public class Chatroom extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    
     private void initComponents() {
 
+     
         user_name = new javax.swing.JLabel();
         Hello = new javax.swing.JLabel();
         scrollPane = new javax.swing.JScrollPane();
@@ -82,6 +110,9 @@ public class Chatroom extends javax.swing.JFrame {
         send = new javax.swing.JButton();
         userList = new javax.swing.JComboBox<>();
 
+        
+
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -101,7 +132,7 @@ public class Chatroom extends javax.swing.JFrame {
             }
         });
 
-        onlineUserList.setText("See Online Users");
+        onlineUserList.setText("Online User on/off");
         onlineUserList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 onlineUserListActionPerformed(evt);
@@ -186,9 +217,9 @@ public class Chatroom extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addComponent(Hello)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(user_name, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(userList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(userList, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(user_name, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
@@ -214,11 +245,21 @@ public class Chatroom extends javax.swing.JFrame {
 
     private void onlineUserListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineUserListActionPerformed
         // See online Users List
+        online_user_dialog.setLocation((this.getLocationOnScreen().x + 516),this.getLocationOnScreen().y);
+        if(online_user_dialog.isVisible()){            
+            online_user_dialog.setVisible(false);
+        }
+        else{
+            writer.println("OUSER");
+            writer.flush(); 
+            online_user_dialog.setVisible(true);
+        }
     }//GEN-LAST:event_onlineUserListActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
         try {
             // Logout
+            online_user_dialog.setVisible(false);
             writer.println("DIS");
             writer.flush();
             writer.close();
