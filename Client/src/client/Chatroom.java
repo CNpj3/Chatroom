@@ -97,8 +97,8 @@ public class Chatroom extends javax.swing.JFrame {
                         frmOpt.setLocation(100, 100);
                         frmOpt.setAlwaysOnTop(true);
                         
-                        filename = reader.readLine();
                         senderName = reader.readLine();
+                        filename = reader.readLine();
                         int result=JOptionPane.showConfirmDialog(
                                 frmOpt,"Do you want to receive file '"+filename+"' from "+senderName+"?",
                                 "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
