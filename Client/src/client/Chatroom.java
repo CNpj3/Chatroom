@@ -42,6 +42,7 @@ public class Chatroom extends javax.swing.JFrame {
         writer = new PrintWriter(socket.getOutputStream());
         writer.flush();
         
+        chatUser = username;
         File myprofile = new File("./data/user/"+username);
         myprofile.mkdirs();
     }
@@ -115,14 +116,13 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILERES")) { 
                         message = reader.readLine();
                         if (message.equals("yes")) {
-                            writer.println("FILESEND");
                             send_file();
                         }
                     }
                     else if(op.equals("FILESEND")) {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
-                        File file = new File("./data/"+user_name.getText()+"/"+filename);
+                        File file = new File("./data/user/"+user_name.getText()+"/"+filename);
                         file.createNewFile();
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -447,18 +447,18 @@ public class Chatroom extends javax.swing.JFrame {
             String filename = null;
             filename = file.getName();
             writer.println("FILEREQ");
-            // writer.println(user_name.getText());
             writer.println(filename);
             writer.flush();
-            JOptionPane.showMessageDialog(null,filename);
         }
     }//GEN-LAST:event_sendFileActionPerformed
     public void send_file() throws IOException {
+        writer.println("FILESEND");
         File file = chooser.getSelectedFile();
         String filename = null;
         try {
             filename = file.getName();
             writer.println(filename);
+            writer.flush();
             
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
