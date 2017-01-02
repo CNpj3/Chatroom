@@ -287,6 +287,7 @@ public class ServerUI extends javax.swing.JFrame {
             try {
                 String[] data;
                 String op;
+                String select_user = "";
                 screen.append("one client connected\n");
                 while((op = reader.readLine()) != null){
                     screen.append("recv op: "+op+"\n" );
@@ -297,15 +298,18 @@ public class ServerUI extends javax.swing.JFrame {
                         //if(user.equals("user") && pass.equals("pass")){
                         if(login_verify(user,pass) && (!user_status.get(user))){
                             writer.println("ok");
+                            writer.flush();
                             user_status.put(user,true);
                             user_socket.put(user,client);
+                            
                         }                        
                         else {
                             writer.println("fail");
+                            writer.flush();
                             user = "";
                             pass = "";
                         }
-                        writer.flush();
+                        
                     }
                     else if (op.equals("REG")) {                        
                         user = reader.readLine();
@@ -317,11 +321,13 @@ public class ServerUI extends javax.swing.JFrame {
                             writer.println("ok");
                             //user_pass_edit.println("");
                             user_pass_edit.println(user+" "+pass);
-                            user_pass_edit.flush();
+                            user_pass_edit.flush();                            
+                            send_UL_to_all();
+                            user_socket.put(user,client);                            
+                            File myprofile = new File("./data/user/"+user);
+                            myprofile.mkdir();
                         }
-                        writer.flush();
-                        send_UL_to_all();
-                        user_socket.put(user,client);                        
+                        writer.flush();                       
                     }
                     else if (op.equals("DIS")) {
                         user_status.put(user,false);
@@ -332,6 +338,20 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                     else if(op.equals("OUSER")){
                         send_OUSER(writer);
+                    }
+                    else if(op.equals("SEL")){
+                        select_user = reader.readLine();
+                        String status = (user_status.get(select_user))?"online":"offline";
+                        writer.println(status);
+                        writer.flush();
+                        send_old_message(user, select_user, writer);
+                    }
+                    else if(op.equals("TEXT")){
+                        String message = reader.readLine();
+                        send_message(user,select_user,message);
+                    }
+                    else if(op.equals("FILE")){
+                        transfer_file(user,select_user,reader);
                     }
                 }
             } catch (IOException ex) {
@@ -345,6 +365,78 @@ public class ServerUI extends javax.swing.JFrame {
         private boolean login_verify(String user, String pass){
             return (pass.equals(user_pass.get(user)));
         }        
+    }
+    public void transfer_file(String send,String receive, BufferedReader source) throws IOException{
+        if(user_status.get(receive)){
+            PrintWriter wr = new PrintWriter(user_socket.get(receive).getOutputStream()); 
+            InputStreamReader read_temp = new InputStreamReader(user_socket.get(receive).getInputStream());
+            BufferedReader rd = new BufferedReader(read_temp);
+            wr.println("FILE");
+            String filename = source.readLine();
+            screen.append(send+" => "+ receive +" <FILENAME= "+filename+" >\n");
+            wr.println(filename);
+            wr.flush();
+            String res = source.readLine();
+            screen.append(receive+" res = "+res+"\n");
+            if(res.equals("yes")){
+                wr.println("yes");
+                wr.flush();
+                for(String file_data; !(file_data = source.readLine()).equals("\0"); ){
+                    wr.println(file_data);
+                }
+                wr.println("\0");
+                wr.flush();
+            }            
+            else{
+                wr.println("no");
+                wr.flush(); 
+                send_message("",send, "User-><"+receive+" ><+ declined file transfer request.");
+            }
+        }
+        else send_message("",send,"User->< "+ receive +" ><- is current offline. File transfer failed.");
+    }
+    public void message_storage(String send, String receive, String message) throws IOException{
+        if(send.equals("")) return;
+        File sender_path = new File("./data/user/"+send+"/"+receive+".txt");
+        File receiver_path = new File("./data/user/"+receive+"/"+send+".txt");
+        PrintWriter sender = new PrintWriter(new BufferedWriter(new FileWriter(sender_path,true)));
+        PrintWriter receiver = new PrintWriter(new BufferedWriter(new FileWriter(receiver_path,true)));
+        sender.println(send+":"+message);
+        sender.flush();
+        sender.close();
+        receiver.println(send+":"+message);
+        receiver.flush();
+        receiver.close();
+    }
+    public void send_message(String send, String receive, String message) throws IOException{
+        message_storage(send,receive,message);
+        if(user_status.get(receive)){
+            PrintWriter wr = new PrintWriter(user_socket.get(receive).getOutputStream()); 
+            InputStreamReader read_temp = new InputStreamReader(user_socket.get(receive).getInputStream());
+            BufferedReader rd = new BufferedReader(read_temp);
+            wr.println("MES");
+            wr.println(send);
+            wr.flush();
+            if(rd.readLine().equals("true") || send.equals("")){//receiver �_���c sender��ҕ��
+                wr.println(send+":"+message);
+                wr.flush();
+            }
+        }
+    }
+    public void send_old_message(String host, String query, PrintWriter wr) throws IOException{
+        File yourFile = new File("./data/user/"+host+"/"+query+".txt");
+        //String[] parts;
+        yourFile.createNewFile(); 
+        BufferedReader br = new BufferedReader(new FileReader(yourFile));
+        wr.println("OLD");
+        for(String line; (line = br.readLine()) != null; ) {
+            // process the line.
+            //parts = line.split(" ");
+            wr.println(line);
+        }
+        wr.println("\0");
+        wr.flush();
+        br.close();
     }
     public void send_OUSER(PrintWriter wr){
         wr.println("OUSER");
