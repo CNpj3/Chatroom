@@ -122,8 +122,9 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILESEND")) {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
+                        File file = new File("./data/"+user_name.getText()+"/"+filename);
+                        FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
-                        OutputStream output = new FileOutputStream("./data/"+user_name.getText()+"/"+filename);
                         byte[] buffer = new byte[1024];
                         int bytesRead, current=0;
                         while ((bytesRead = in.read(buffer)) != -1) {
