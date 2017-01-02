@@ -389,6 +389,7 @@ public class Chatroom extends javax.swing.JFrame {
             filename = file.toPath().toString();
             writer.println("FILE");
             writer.println(filename);
+            writer.flush();
             JOptionPane.showMessageDialog(null,filename);
         }
     }//GEN-LAST:event_sendFileActionPerformed
