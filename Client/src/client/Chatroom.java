@@ -131,12 +131,16 @@ public class Chatroom extends javax.swing.JFrame {
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
                         byte[] buffer = new byte[1024];
-                        int bytesRead, current=0;
+                        int bytesRead =0, current=0;
                         int length = Integer.parseInt(len);
-                        while ((bytesRead = in.read(buffer)) != -1 || current < length) {
+                        while ((bytesRead = in.read(buffer)) != -1 ) {
+
                             output.write(buffer, 0, bytesRead);
                             current+=bytesRead;
+                            //textArea.append(current+" bytes transfer..."+length+"\n");
+                            if(current > length) break;
                         }
+                        //textArea.append("out of while\n");
                         output.close();
                         textArea.append("File '"+filename+"' downloaded (" + current+" bytes read).\n");
                     }
@@ -473,13 +477,20 @@ public class Chatroom extends javax.swing.JFrame {
             FileInputStream fis = null;
             dos = new DataOutputStream(socket.getOutputStream());
             fis = new FileInputStream(file);
-            while (fis.read(buffer) != -1) {
+            int count = 0;
+            int current;
+            while ((current = fis.read(buffer) )!= -1) {
                 dos.write(buffer);
+                count+=current;
+                //textArea.append(count+" bytes transfer..."+len+"\n");
             }
             //dos.close();
             //dos.flush(buffer);
             //dos.write(EOS);
+            textArea.append(count+" bytes transfer...\n");
+            //textArea.append("out of while\n");
             fis.close();
+            //textArea.append("closed\n");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

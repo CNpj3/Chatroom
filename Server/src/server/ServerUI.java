@@ -388,13 +388,20 @@ public class ServerUI extends javax.swing.JFrame {
                             dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
                             dis = new DataInputStream(client.getInputStream());
                             int length = Integer.parseInt(len);
-                            while ((part += dis.read(buffer)) != -1 || length > part) {
+                            int current =0;
+                            while ((current = dis.read(buffer)) != -1 ) {                    
                                 dos.write(buffer);
+                                part+=current;
+                                //screen.append(part+" bytes transfer..."+length+"\n");
+                                if(length <= part) break;
                             }
+                            screen.append(part+" bytes transfer...\n");
                             //dos.flush();
                             //dos.close();
-                            dis.close();
+                            //screen.append("out of while\n");
+                            //dis.close();
                             //dos.write(EOS);
+                            //screen.append("closed\n");
                         }
                         else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
 
