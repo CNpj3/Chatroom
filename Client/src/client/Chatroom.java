@@ -78,6 +78,7 @@ public class Chatroom extends javax.swing.JFrame {
                         if (message.equals("yes")) send_file();
                         else if (message.equals("no")) {}
                         else {}
+                        
                     }
                     else if(op.equals("OLD")) {
                         message = reader.readLine();
