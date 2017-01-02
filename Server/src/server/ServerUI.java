@@ -301,7 +301,7 @@ public class ServerUI extends javax.swing.JFrame {
                             writer.flush();
                             user_status.put(user,true);
                             user_socket.put(user,client);
-                            //welcome(user);
+                            
                         }                        
                         else {
                             writer.println("fail");
