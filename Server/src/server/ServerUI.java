@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.DefaultCaret;
+import static jdk.internal.util.xml.impl.Parser.EOS;
 
 /**
  *
@@ -372,24 +373,28 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                     else if(op.equals("FILESEND")){
                         String filename = reader.readLine();
+                        String len = reader.readLine();
                         PrintWriter fsend = new PrintWriter(user_socket.get(select_user).getOutputStream());
-                        send_protocol(filename,"",fsend,"FILESEND");
+                        send_protocol(filename,len,fsend,"FILESEND");
                         //transfer_file(user,select_user);
                         ////
+
                         screen.append("filename:"+filename+",before transmission...\n");
                         if(user_status.get(select_user)){
                             byte[] buffer = new byte[1024];
                             DataOutputStream dos = null;
                             DataInputStream dis = null;
+                            int part = 0 ;
                             dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
                             dis = new DataInputStream(client.getInputStream());
-                            while (dis.read(buffer) > 0) {
+                            int length = Integer.parseInt(len);
+                            while ((part += dis.read(buffer)) != -1 || length > part) {
                                 dos.write(buffer);
                             }
-                            dos.write(null);
-                            dos.close();
+                            //dos.flush();
+                            //dos.close();
                             dis.close();
-
+                            //dos.write(EOS);
                         }
                         else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
 
@@ -451,8 +456,7 @@ public class ServerUI extends javax.swing.JFrame {
             wr.println("MES");
             wr.println(send);
             wr.println(send+": "+message);
-            wr.flush();
-            
+            wr.flush();            
         }
     }
     public void send_old_message(String host, String query, PrintWriter wr) throws IOException{

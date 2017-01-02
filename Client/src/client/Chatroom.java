@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.Font;
+import static jdk.internal.util.xml.impl.Parser.EOS;
 
 /**
  *
@@ -123,13 +124,15 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILESEND")) {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
+                        String len = reader.readLine();
                         File file = new File("./data/user/"+user_name.getText()+"/"+filename);
                         file.createNewFile();
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
                         byte[] buffer = new byte[1024];
                         int bytesRead, current=0;
-                        while ((bytesRead = in.read(buffer)) != -1) {
+                        int length = Integer.parseInt(len);
+                        while ((bytesRead = in.read(buffer)) != -1 || current < length) {
                             output.write(buffer, 0, bytesRead);
                             current+=bytesRead;
                         }
@@ -451,7 +454,7 @@ public class Chatroom extends javax.swing.JFrame {
             // writer.println(user_name.getText());
             writer.println(filename);
             writer.flush();
-            JOptionPane.showMessageDialog(null,filename);
+            //JOptionPane.showMessageDialog(null,filename);
         }
     }//GEN-LAST:event_sendFileActionPerformed
     public void send_file() throws IOException {
@@ -460,18 +463,20 @@ public class Chatroom extends javax.swing.JFrame {
         try {
             filename = file.getName();
             writer.println(filename);
+            Long len = file.length();            
+            writer.println(len.toString());
             writer.flush();
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
             FileInputStream fis = null;
             dos = new DataOutputStream(socket.getOutputStream());
             fis = new FileInputStream(file);
-            while (fis.read(buffer) > 0) {
+            while (fis.read(buffer) != -1) {
                 dos.write(buffer);
             }
-            buffer = null;
-            dos.write(buffer);
-            dos.close();
+            //dos.close();
+            //dos.flush(buffer);
+            //dos.write(EOS);
             fis.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
