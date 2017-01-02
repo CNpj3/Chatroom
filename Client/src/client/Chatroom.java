@@ -71,30 +71,7 @@ public class Chatroom extends javax.swing.JFrame {
                         }
                     }
                     else if(op.equals("FILE")) {
-                        String filename = reader.readLine();
-                        int result=JOptionPane.showConfirmDialog(
-                                null,"Do you want to receive file '"+filename+"' from "+chatUser+"?",
-                                "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                        
-                        if (result == JOptionPane.YES_OPTION) { /* recv file */
-                            writer.println("yes");
-                            textArea.append(chatUser+"is sending you file......\n");
-                            message = reader.readLine();
-
-                            InputStream in = socket.getInputStream();
-                            OutputStream output = new FileOutputStream(filename);
-                            byte[] buffer = new byte[1024];
-                            int bytesRead, current=0;
-                            while ((bytesRead = in.read(buffer)) != -1) {
-                                output.write(buffer, 0, bytesRead);
-                                current+=bytesRead;
-                            }
-                            output.close();
-                            textArea.append("File '"+filename+"' downloaded (" + bytesRead+" bytes read.)\n");
-                            
-                        } else if (result == JOptionPane.NO_OPTION) {
-                            writer.println("no");
-                        } else {}    
+                        receive_file();
                     }
                     else if(op.equals("OLD")) {
                         message = reader.readLine();
@@ -103,22 +80,12 @@ public class Chatroom extends javax.swing.JFrame {
                         }
                     }
                     else if(op.equals("MES")) {
-                        String senderName = reader.readLine();
-                        if (chatUser.equals(senderName)) {
-                            writer.println("true");
-                            message = reader.readLine();
-                            textArea.append(message+'\n');
-                        } else {
-                            writer.println("false");
-                        }
+                        receive_message();
                     }
-//                    else if(op.equals("online")) {            
-//                        JOptionPane.showMessageDialog(null, op);
-//                        revOnline = true;
-//                    }
-//                    else if(op.equals("offline")) {
-//                        revOnline = false;
-//                    }
+                    else if(op.equals("STATUS")) {
+                        message = reader.readLine();
+                        set_status(message);
+                    }
                 }
             } catch (IOException ex) {
                 
@@ -320,7 +287,7 @@ public class Chatroom extends javax.swing.JFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(textInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(onlineUserList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(logout))
                 .addContainerGap())
@@ -385,27 +352,23 @@ public class Chatroom extends javax.swing.JFrame {
     }//GEN-LAST:event_logoutActionPerformed
 
     private void changeUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUserActionPerformed
-        try {
-            Object user = userList.getSelectedItem();
-            chatUser = user.toString();
-            writer.println("SEL");
-            writer.println(chatUser);
-            writer.flush(); 
-            
-            String status = reader.readLine();
-            JOptionPane.showMessageDialog(null, status);
-            if (status.equals("online")) {
-                revOnline = true;
-            } else if (status.equals("offline")) {
-                revOnline = false;
-            } else {
-                revOnline = false;
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Object user = userList.getSelectedItem();
+        chatUser = user.toString();
+        writer.println("SEL");
+        writer.println(chatUser);
+        writer.flush(); 
     }//GEN-LAST:event_changeUserActionPerformed
-
+    public void set_status(String status) {
+        if (status.equals("online")) {
+            revOnline = true;
+        } else if (status.equals("offline")) {
+            revOnline = false;
+        } else {
+            JOptionPane.showMessageDialog(null, status);
+            revOnline = false;
+        }
+    }
+    
     private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed
         if (!revOnline) {
             JOptionPane.showMessageDialog(null, "You can't send file to a OFFLINE user.");
@@ -413,7 +376,6 @@ public class Chatroom extends javax.swing.JFrame {
         else {
             File file = chooser.getSelectedFile();
             String filename = null;
-            
             try {
                 filename = file.getCanonicalPath();
                 byte[] buffer = new byte[1024];
@@ -438,7 +400,45 @@ public class Chatroom extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_sendFileActionPerformed
+    public void receive_file() throws IOException {
+        String message;
+        String filename = reader.readLine();
+        int result=JOptionPane.showConfirmDialog(
+                null,"Do you want to receive file '"+filename+"' from "+chatUser+"?",
+                "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
 
+        if (result == JOptionPane.YES_OPTION) { /* recv file */
+            writer.println("yes");
+            textArea.append(chatUser+"is sending you file......\n");
+            message = reader.readLine();
+
+            InputStream in = socket.getInputStream();
+            OutputStream output = new FileOutputStream(filename);
+            byte[] buffer = new byte[1024];
+            int bytesRead, current=0;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+                current+=bytesRead;
+            }
+            output.close();
+            textArea.append("File '"+filename+"' downloaded (" + bytesRead+" bytes read.)\n");
+        } else if (result == JOptionPane.NO_OPTION) {
+            writer.println("no");
+        } else {}    
+        writer.flush();
+    }
+    public void receive_message() throws IOException {
+        String message;
+        String senderName = reader.readLine();
+        if (chatUser.equals(senderName)) {
+            writer.println("true");
+            message = reader.readLine();
+            textArea.append(message+'\n');
+        } else {
+            writer.println("false");
+        }
+        writer.flush();
+    }
     /**
      * @param args the command line arguments
      */
