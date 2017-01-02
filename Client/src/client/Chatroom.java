@@ -44,6 +44,7 @@ public class Chatroom extends javax.swing.JFrame {
         writer.flush();
         chatUser="";
         
+        chatUser = username;
         File myprofile = new File("./data/user/"+username);
         myprofile.mkdirs();
     }
@@ -117,7 +118,6 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILERES")) { 
                         message = reader.readLine();
                         if (message.equals("yes")) {
-                            writer.println("FILESEND");
                             send_file();
                         }
                     }
@@ -125,6 +125,7 @@ public class Chatroom extends javax.swing.JFrame {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
                         String len = reader.readLine();
+
                         File file = new File("./data/user/"+user_name.getText()+"/"+filename);
                         file.createNewFile();
                         FileOutputStream output = new FileOutputStream(file, false);
@@ -451,13 +452,13 @@ public class Chatroom extends javax.swing.JFrame {
             String filename = null;
             filename = file.getName();
             writer.println("FILEREQ");
-            // writer.println(user_name.getText());
             writer.println(filename);
             writer.flush();
-            //JOptionPane.showMessageDialog(null,filename);
+
         }
     }//GEN-LAST:event_sendFileActionPerformed
     public void send_file() throws IOException {
+        writer.println("FILESEND");
         File file = chooser.getSelectedFile();
         String filename = null;
         try {
@@ -466,6 +467,7 @@ public class Chatroom extends javax.swing.JFrame {
             Long len = file.length();            
             writer.println(len.toString());
             writer.flush();
+
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
             FileInputStream fis = null;
