@@ -380,7 +380,7 @@ public class Chatroom extends javax.swing.JFrame {
     private void changeUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUserActionPerformed
         chatUser = userList.getSelectedItem();
         writer.println("SEL");
-        writer.println(chatUser);
+        writer.println(chatUser.toString());
         writer.flush(); 
         try {
             String rev = reader.readLine();
