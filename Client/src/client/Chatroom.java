@@ -93,12 +93,11 @@ public class Chatroom extends javax.swing.JFrame {
                     }
                     else if(op.equals("STATUS")) {
                         message = reader.readLine();
-                        JOptionPane.showMessageDialog(null,message);
                         set_status(message);
                     }
                 }
             } catch (IOException ex) {
-                
+                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -387,22 +386,17 @@ public class Chatroom extends javax.swing.JFrame {
         else {
             File file = chooser.getSelectedFile();
             String filename = null;
-            try {
-                filename = file.getCanonicalPath();
-                writer.println("FILE");
-                writer.println(filename);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            filename = file.toPath().toString();
+            writer.println("FILE");
+            writer.println(filename);
+            JOptionPane.showMessageDialog(null,filename);
         }
     }//GEN-LAST:event_sendFileActionPerformed
     public void send_file() throws IOException {
         File file = chooser.getSelectedFile();
         String filename = null;
         try {
-            filename = file.getCanonicalPath();
+            filename = file.toPath().toString();
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
             FileInputStream fis = null;
