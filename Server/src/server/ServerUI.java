@@ -387,11 +387,19 @@ public class ServerUI extends javax.swing.JFrame {
                 resp.println("FILERES");
                 resp.println("yes");
                 resp.flush();
-                for(String file_data; !(file_data = source.readLine()).equals("\0"); ){
-                    wr.println(file_data);
+                //file transfer start
+                byte[] buffer = new byte[1024];
+                DataOutputStream dos = null;
+                DataInputStream dis = null;
+                dos = new DataOutputStream(user_socket.get(receive).getOutputStream());
+                dis = new DataInputStream(user_socket.get(send).getInputStream());
+                while (dis.read(buffer) > 0) {
+                    dos.write(buffer);
                 }
-                wr.println("\0");
-                wr.flush();
+                dos.write(null);
+                dos.close();
+                dis.close();
+                //file transfer end
             }            
             else{
                 wr.println("no");
@@ -423,7 +431,7 @@ public class ServerUI extends javax.swing.JFrame {
             wr.println("MES");
             wr.println(send);
             wr.flush();
-            if(rd.readLine().equals("true") || send.equals("")){//receiver �_���c sender��ҕ��
+            if(rd.readLine().equals("true") || send.equals("")){//receiver acc  sender file req
                 wr.println(send+": "+message);
                 wr.flush();
             }
