@@ -26,20 +26,21 @@ public class Chatroom extends javax.swing.JFrame {
     javax.swing.JTextArea online_user_textArea = new javax.swing.JTextArea();
     
     
-    
+    Object chatUser;
+    boolean revOnline = false;   
+    JFileChooser chooser = new JFileChooser();
     
     public Chatroom() {
         initComponents();
         intiOnline_user();
     }
     public void getAccount(Socket sc, String username, String password) throws IOException {
-        socket = sc;    // Does it work??
-        
-            user_name.setText(username);
-            InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
-            reader = new BufferedReader(streamreader);
-            writer = new PrintWriter(socket.getOutputStream());
-            writer.flush();
+        socket = sc;
+        user_name.setText(username);
+        InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
+        reader = new BufferedReader(streamreader);
+        writer = new PrintWriter(socket.getOutputStream());
+        writer.flush();
         
     }
     public void listen(){
@@ -52,6 +53,7 @@ public class Chatroom extends javax.swing.JFrame {
             try {
                 String[] data;
                 String op;
+                String message;
                 while((op = reader.readLine()) != null){
                     if(op.equals("UL")){
                         userList.removeAllItems();
@@ -66,6 +68,48 @@ public class Chatroom extends javax.swing.JFrame {
                         while(!(op.equals("\0"))){
                             online_user_textArea.append(op+"\n");
                             op = reader.readLine();
+                        }
+                    }
+                    else if(op.equals("FILE")) {
+                        String filename = reader.readLine();
+                        int result=JOptionPane.showConfirmDialog(
+                                null,"Do you want to receive file '"+filename+"' from "+chatUser+"?",
+                                "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+                        
+                        if (result == JOptionPane.YES_OPTION) { /* recv file */
+                            writer.println("yes");
+                            textArea.append(chatUser+"is sending you file......\n");
+                            message = reader.readLine();
+
+                            InputStream in = socket.getInputStream();
+                            OutputStream output = new FileOutputStream(filename);
+                            byte[] buffer = new byte[1024];
+                            int bytesRead, current=0;
+                            while ((bytesRead = in.read(buffer)) != -1) {
+                                output.write(buffer, 0, bytesRead);
+                                current+=bytesRead;
+                            }
+                            output.close();
+                            textArea.append("File '"+filename+"' downloaded (" + bytesRead+" bytes read.)\n");
+                            
+                        } else if (result == JOptionPane.NO_OPTION) {
+                            writer.println("no");
+                        } else {}    
+                    }
+                    else if(op.equals("OLD")) {
+                        message = reader.readLine();
+                        while (!(message.equals("\0"))) {
+                            textArea.append(message+'\n');
+                        }
+                    }
+                    else if(op.equals("MES")) {
+                        String senderName = reader.readLine();
+                        if (chatUser.equals(senderName)) {
+                            writer.println("true");
+                            message = reader.readLine();
+                            textArea.append(message+'\n');
+                        } else {
+                            writer.println("false");
                         }
                     }
                 }
@@ -98,18 +142,21 @@ public class Chatroom extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jDialog1 = new javax.swing.JDialog();
+        jFileChooser1 = new javax.swing.JFileChooser();
         user_name = new javax.swing.JLabel();
         Hello = new javax.swing.JLabel();
         scrollPane = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
-        sendFile = new javax.swing.JButton();
         onlineUserList = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        textInput = new javax.swing.JTextField();
-        send = new javax.swing.JButton();
+        fileToSend = new javax.swing.JTextField();
+        chooseFile = new javax.swing.JButton();
+        sendFile = new javax.swing.JButton();
         userList = new javax.swing.JComboBox<>();
         changeUser = new javax.swing.JButton();
+        textInput = new javax.swing.JTextField();
+        send = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -145,13 +192,6 @@ public class Chatroom extends javax.swing.JFrame {
         textArea.setRows(5);
         scrollPane.setViewportView(textArea);
 
-        sendFile.setText("Send File");
-        sendFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sendFileActionPerformed(evt);
-            }
-        });
-
         onlineUserList.setText("Online User on/off");
         onlineUserList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -166,10 +206,17 @@ public class Chatroom extends javax.swing.JFrame {
             }
         });
 
-        send.setText("Send");
-        send.addActionListener(new java.awt.event.ActionListener() {
+        chooseFile.setText("Choose File");
+        chooseFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sendActionPerformed(evt);
+                chooseFileActionPerformed(evt);
+            }
+        });
+
+        sendFile.setText("Send File");
+        sendFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendFileActionPerformed(evt);
             }
         });
 
@@ -178,34 +225,23 @@ public class Chatroom extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(textInput)
-                .addGap(33, 33, 33)
-                .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addComponent(fileToSend, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chooseFile, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(sendFile, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(send))
-                .addGap(29, 29, 29))
+                    .addComponent(fileToSend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chooseFile)
+                    .addComponent(sendFile))
+                .addGap(0, 27, Short.MAX_VALUE))
         );
-
-        userList.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
-            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
-                userListPopupMenuWillBecomeVisible(evt);
-            }
-            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-            }
-        });
-        userList.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                userListActionPerformed(evt);
-            }
-        });
 
         changeUser.setText("go");
         changeUser.addActionListener(new java.awt.event.ActionListener() {
@@ -214,13 +250,38 @@ public class Chatroom extends javax.swing.JFrame {
             }
         });
 
+        send.setText("Send");
+        send.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addComponent(onlineUserList)
+                        .addGap(18, 18, 18)
+                        .addComponent(logout, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(textInput, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(Hello, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(432, Short.MAX_VALUE))
@@ -230,20 +291,7 @@ public class Chatroom extends javax.swing.JFrame {
                         .addComponent(userList, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(changeUser, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(23, 23, 23))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(sendFile, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)
-                        .addComponent(onlineUserList)
-                        .addGap(18, 18, 18)
-                        .addComponent(logout, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 1, Short.MAX_VALUE))
-                    .addComponent(scrollPane)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGap(44, 44, 44))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -256,12 +304,16 @@ public class Chatroom extends javax.swing.JFrame {
                     .addComponent(userList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(changeUser))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(send)
+                        .addGap(2, 2, 2)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sendFile)
                     .addComponent(onlineUserList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(logout))
                 .addContainerGap())
@@ -272,11 +324,27 @@ public class Chatroom extends javax.swing.JFrame {
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
         // Send text
+        writer.println("TEXT");                           
+        String message = textInput.getText();
+        String username = user_name.getText();
+        writer.println(message);
+        writer.flush();
+        textInput.setText("");
+        textArea.append(username+": "+message+'\n');
     }//GEN-LAST:event_sendActionPerformed
 
-    private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed
-        // Send File
-    }//GEN-LAST:event_sendFileActionPerformed
+    private void chooseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFileActionPerformed
+        // Choose File
+        if (!revOnline) {
+            JOptionPane.showMessageDialog(null, "You can't send file to a OFFLINE user.");
+        }
+        else {
+            chooser.showOpenDialog(null);
+            File file = chooser.getSelectedFile();
+            String filename = file.getAbsolutePath();
+            fileToSend.setText(filename);
+        }
+    }//GEN-LAST:event_chooseFileActionPerformed
 
     private void onlineUserListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineUserListActionPerformed
         // See online Users List
@@ -309,22 +377,55 @@ public class Chatroom extends javax.swing.JFrame {
         new Client().setVisible(true);
     }//GEN-LAST:event_logoutActionPerformed
 
-    private void userListPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_userListPopupMenuWillBecomeVisible
-        
-    }//GEN-LAST:event_userListPopupMenuWillBecomeVisible
-
-    private void userListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userListActionPerformed
-        
-    }//GEN-LAST:event_userListActionPerformed
-
     private void changeUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUserActionPerformed
-        Object user = userList.getSelectedItem();
+        chatUser = userList.getSelectedItem();
         writer.println("SEL");
-        writer.println(user);
-        writer.flush();
-        
-        
+        writer.println(chatUser);
+        writer.flush(); 
+        try {
+            String rev = reader.readLine();
+            if (rev.equals("online")) {
+                revOnline = true;
+            } else if (rev.equals("offline")) {
+                revOnline = false;
+            }
+        } catch (Exception e) {
+            
+        }
     }//GEN-LAST:event_changeUserActionPerformed
+
+    private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed
+        if (!revOnline) {
+            JOptionPane.showMessageDialog(null, "You can't send file to a OFFLINE user.");
+        }
+        else {
+            File file = chooser.getSelectedFile();
+            String filename = null;
+            
+            try {
+                filename = file.getCanonicalPath();
+                byte[] buffer = new byte[1024];
+                DataOutputStream dos = null;
+                FileInputStream fis = null;
+                writer.println("FILE");
+                writer.println(filename);
+                String rev = reader.readLine();
+                if (rev.equals("yes")) {
+                    dos = new DataOutputStream(socket.getOutputStream());
+                    fis = new FileInputStream(file);
+                    while (fis.read(buffer) > 0) {
+                        dos.write(buffer);
+                    }
+                }
+                dos.close();
+                fis.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_sendFileActionPerformed
 
     /**
      * @param args the command line arguments
@@ -364,7 +465,10 @@ public class Chatroom extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Hello;
     private javax.swing.JButton changeUser;
+    private javax.swing.JButton chooseFile;
+    private javax.swing.JTextField fileToSend;
     private javax.swing.JDialog jDialog1;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton logout;

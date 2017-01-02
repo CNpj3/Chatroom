@@ -28,18 +28,24 @@
               <EmptySpace pref="123" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="registerButton" min="-2" pref="307" max="-2" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="Pass" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="User" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="Port" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="userInput" max="32767" attributes="0"/>
-                          <Component id="passInput" pref="130" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="portInput" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="userInput" max="32767" attributes="0"/>
+                                  <Component id="passInput" pref="130" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="loginButton" min="-2" pref="77" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="loginButton" min="-2" pref="77" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace min="-2" pref="111" max="-2" attributes="0"/>
@@ -51,7 +57,12 @@
           <Group type="102" alignment="0" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="189" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="151" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="portInput" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="Port" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="userInput" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="User" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -110,6 +121,16 @@
     <Component class="javax.swing.JLabel" name="Pass">
       <Properties>
         <Property name="text" type="java.lang.String" value="Password"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="portInput">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="2222"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="Port">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Port"/>
       </Properties>
     </Component>
   </SubComponents>

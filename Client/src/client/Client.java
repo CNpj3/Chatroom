@@ -18,6 +18,7 @@ import java.util.*;
 public class Client extends javax.swing.JFrame {
 
     String username, password;
+    int port;
     Socket socket;
     BufferedReader reader;
     PrintWriter writer;
@@ -41,6 +42,8 @@ public class Client extends javax.swing.JFrame {
         registerButton = new javax.swing.JButton();
         User = new javax.swing.JLabel();
         Pass = new javax.swing.JLabel();
+        portInput = new javax.swing.JTextField();
+        Port = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -68,6 +71,10 @@ public class Client extends javax.swing.JFrame {
 
         Pass.setText("Password");
 
+        portInput.setText("2222");
+
+        Port.setText("Port");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -79,13 +86,17 @@ public class Client extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(Pass)
-                            .addComponent(User))
+                            .addComponent(User)
+                            .addComponent(Port))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(userInput)
-                            .addComponent(passInput, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(portInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(userInput)
+                                    .addComponent(passInput, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(111, 111, 111))
         );
         layout.setVerticalGroup(
@@ -93,7 +104,11 @@ public class Client extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(189, 189, 189)
+                        .addGap(151, 151, 151)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(portInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Port))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(userInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(User))
@@ -115,25 +130,10 @@ public class Client extends javax.swing.JFrame {
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         username = userInput.getText();
         password = passInput.getText();
+        int port = Integer.valueOf(portInput.getText());
         
-        /* test login
-        if (username.equals("user") && password.equals("pass")) {
-            try {
-                JOptionPane.showMessageDialog(null, "you are successfully login.");
-               Chatroom chatroom = new Chatroom();
-                chatroom.getAccount(username, password);
-                this.dispose();
-                chatroom.setVisible(true);
-            }
-            catch (Exception e){
-
-            }
-        }
-        */
-        
-        // login by socket
         try {          
-            socket = new Socket("localhost",2222);
+            socket = new Socket("localhost",port);
             InputStreamReader streamreader = new InputStreamReader(socket.getInputStream());
             reader = new BufferedReader(streamreader);
             writer = new PrintWriter(socket.getOutputStream());
@@ -226,9 +226,11 @@ public class Client extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Pass;
+    private javax.swing.JLabel Port;
     private javax.swing.JLabel User;
     private javax.swing.JButton loginButton;
     private javax.swing.JTextField passInput;
+    private javax.swing.JTextField portInput;
     private javax.swing.JButton registerButton;
     private javax.swing.JTextField userInput;
     // End of variables declaration//GEN-END:variables
