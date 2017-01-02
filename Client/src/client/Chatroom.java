@@ -123,6 +123,7 @@ public class Chatroom extends javax.swing.JFrame {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
                         File file = new File("./data/"+user_name.getText()+"/"+filename);
+                        file.createNewFile();
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
                         byte[] buffer = new byte[1024];
