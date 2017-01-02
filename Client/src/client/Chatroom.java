@@ -445,7 +445,7 @@ public class Chatroom extends javax.swing.JFrame {
             String filename = null;
             filename = file.getName();
             writer.println("FILEREQ");
-            writer.println(user_name.getText());
+            // writer.println(user_name.getText());
             writer.println(filename);
             writer.flush();
             JOptionPane.showMessageDialog(null,filename);
