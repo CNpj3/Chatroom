@@ -396,12 +396,7 @@ public class ServerUI extends javax.swing.JFrame {
                                 if(length <= part) break;
                             }
                             screen.append(part+" bytes transfer...\n");
-                            //dos.flush();
-                            //dos.close();
-                            //screen.append("out of while\n");
-                            //dis.close();
-                            //dos.write(EOS);
-                            //screen.append("closed\n");
+                            
                         }
                         else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
 

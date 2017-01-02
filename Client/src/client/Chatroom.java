@@ -137,10 +137,8 @@ public class Chatroom extends javax.swing.JFrame {
 
                             output.write(buffer, 0, bytesRead);
                             current+=bytesRead;
-                            //textArea.append(current+" bytes transfer..."+length+"\n");
                             if(current > length) break;
                         }
-                        //textArea.append("out of while\n");
                         output.close();
                         textArea.append("File '"+filename+"' downloaded (" + current+" bytes read).\n");
                     }
@@ -484,13 +482,8 @@ public class Chatroom extends javax.swing.JFrame {
                 count+=current;
                 //textArea.append(count+" bytes transfer..."+len+"\n");
             }
-            //dos.close();
-            //dos.flush(buffer);
-            //dos.write(EOS);
             textArea.append(count+" bytes transfer...\n");
-            //textArea.append("out of while\n");
             fis.close();
-            //textArea.append("closed\n");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
