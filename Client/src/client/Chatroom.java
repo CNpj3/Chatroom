@@ -77,13 +77,16 @@ public class Chatroom extends javax.swing.JFrame {
                         message = reader.readLine();
                         while (!(message.equals("\0"))) {
                             textArea.append(message+'\n');
+                            message = reader.readLine();
                         }
                     }
                     else if(op.equals("MES")) {
-                        receive_message();
+                        message = reader.readLine();
+                        receive_message(message);
                     }
                     else if(op.equals("STATUS")) {
                         message = reader.readLine();
+                        JOptionPane.showMessageDialog(null,message);
                         set_status(message);
                     }
                 }
@@ -427,9 +430,8 @@ public class Chatroom extends javax.swing.JFrame {
         } else {}    
         writer.flush();
     }
-    public void receive_message() throws IOException {
+    public void receive_message(String senderName) throws IOException {
         String message;
-        String senderName = reader.readLine();
         if (chatUser.equals(senderName)) {
             writer.println("true");
             message = reader.readLine();
