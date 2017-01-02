@@ -356,7 +356,7 @@ public class ServerUI extends javax.swing.JFrame {
                         send_message(user,select_user,message);
                     }
                     else if(op.equals("FILE")){
-                        transfer_file(user,select_user,reader);
+                        transfer_file(user,select_user,reader,writer);
                     }
                 }
             } catch (IOException ex) {
@@ -371,7 +371,7 @@ public class ServerUI extends javax.swing.JFrame {
             return (pass.equals(user_pass.get(user)));
         }        
     }
-    public void transfer_file(String send,String receive, BufferedReader source) throws IOException{
+    public void transfer_file(String send,String receive, BufferedReader source,PrintWriter resp) throws IOException{
         if(user_status.get(receive)){
             PrintWriter wr = new PrintWriter(user_socket.get(receive).getOutputStream()); 
             InputStreamReader read_temp = new InputStreamReader(user_socket.get(receive).getInputStream());
@@ -384,8 +384,9 @@ public class ServerUI extends javax.swing.JFrame {
             String res = source.readLine();
             screen.append(receive+" res = "+res+"\n");
             if(res.equals("yes")){
-                wr.println("yes");
-                wr.flush();
+                resp.println("FILERES");
+                resp.println("yes");
+                resp.flush();
                 for(String file_data; !(file_data = source.readLine()).equals("\0"); ){
                     wr.println(file_data);
                 }
@@ -406,10 +407,10 @@ public class ServerUI extends javax.swing.JFrame {
         File receiver_path = new File("./data/user/"+receive+"/"+send+".txt");
         PrintWriter sender = new PrintWriter(new BufferedWriter(new FileWriter(sender_path,true)));
         PrintWriter receiver = new PrintWriter(new BufferedWriter(new FileWriter(receiver_path,true)));
-        sender.println(send+":"+message);
+        sender.println(send+": "+message);
         sender.flush();
         sender.close();
-        receiver.println(send+":"+message);
+        receiver.println(send+": "+message);
         receiver.flush();
         receiver.close();
     }
@@ -423,7 +424,7 @@ public class ServerUI extends javax.swing.JFrame {
             wr.println(send);
             wr.flush();
             if(rd.readLine().equals("true") || send.equals("")){//receiver �_���c sender��ҕ��
-                wr.println(send+":"+message);
+                wr.println(send+": "+message);
                 wr.flush();
             }
         }
