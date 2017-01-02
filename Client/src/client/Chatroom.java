@@ -76,9 +76,6 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILERES")) {
                         message = reader.readLine();
                         if (message.equals("yes")) send_file();
-                        else if (message.equals("no")) {}
-                        else {}
-                        
                     }
                     else if(op.equals("OLD")) {
                         message = reader.readLine();
@@ -371,8 +368,6 @@ public class Chatroom extends javax.swing.JFrame {
     public void set_status(String status) {
         if (status.equals("online")) {
             revOnline = true;
-        } else if (status.equals("offline")) {
-            revOnline = false;
         } else {
             JOptionPane.showMessageDialog(null, status);
             revOnline = false;
@@ -406,6 +401,8 @@ public class Chatroom extends javax.swing.JFrame {
             while (fis.read(buffer) > 0) {
                 dos.write(buffer);
             }
+            buffer = null;
+            writer.print(buffer);
             dos.close();
             fis.close();
         } catch (FileNotFoundException ex) {
