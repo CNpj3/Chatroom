@@ -26,7 +26,7 @@ public class Chatroom extends javax.swing.JFrame {
     javax.swing.JTextArea online_user_textArea = new javax.swing.JTextArea();
     
     
-    Object chatUser;
+    String chatUser;
     boolean revOnline = false;   
     JFileChooser chooser = new JFileChooser();
     
@@ -112,6 +112,13 @@ public class Chatroom extends javax.swing.JFrame {
                             writer.println("false");
                         }
                     }
+//                    else if(op.equals("online")) {            
+//                        JOptionPane.showMessageDialog(null, op);
+//                        revOnline = true;
+//                    }
+//                    else if(op.equals("offline")) {
+//                        revOnline = false;
+//                    }
                 }
             } catch (IOException ex) {
                 
@@ -378,19 +385,24 @@ public class Chatroom extends javax.swing.JFrame {
     }//GEN-LAST:event_logoutActionPerformed
 
     private void changeUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUserActionPerformed
-        chatUser = userList.getSelectedItem();
-        writer.println("SEL");
-        writer.println(chatUser.toString());
-        writer.flush(); 
         try {
-            String rev = reader.readLine();
-            if (rev.equals("online")) {
+            Object user = userList.getSelectedItem();
+            chatUser = user.toString();
+            writer.println("SEL");
+            writer.println(chatUser);
+            writer.flush(); 
+            
+            String status = reader.readLine();
+            JOptionPane.showMessageDialog(null, status);
+            if (status.equals("online")) {
                 revOnline = true;
-            } else if (rev.equals("offline")) {
+            } else if (status.equals("offline")) {
+                revOnline = false;
+            } else {
                 revOnline = false;
             }
-        } catch (Exception e) {
-            
+        } catch (IOException ex) {
+            Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_changeUserActionPerformed
 
