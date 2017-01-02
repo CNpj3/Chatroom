@@ -325,7 +325,7 @@ public class ServerUI extends javax.swing.JFrame {
                             send_UL_to_all();
                             user_socket.put(user,client);                            
                             File myprofile = new File("./data/user/"+user);
-                            myprofile.mkdir();
+                            myprofile.mkdirs();
                         }
                         writer.flush();                       
                     }
@@ -341,7 +341,12 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                     else if(op.equals("SEL")){
                         select_user = reader.readLine();
-                        String status = (user_status.get(select_user))?"online":"offline";
+                        screen.append("select_user = "+ select_user+"\n");
+                        String status;
+                        if(user_status.get(select_user))status = "online";
+                        else status = "offline";
+                        screen.append("status = " +status+"\n");
+                        writer.println("STATUS");
                         writer.println(status);
                         writer.flush();
                         send_old_message(user, select_user, writer);
@@ -429,6 +434,7 @@ public class ServerUI extends javax.swing.JFrame {
         yourFile.createNewFile(); 
         BufferedReader br = new BufferedReader(new FileReader(yourFile));
         wr.println("OLD");
+        wr.flush();
         for(String line; (line = br.readLine()) != null; ) {
             // process the line.
             //parts = line.split(" ");
