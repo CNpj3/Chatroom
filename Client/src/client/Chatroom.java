@@ -456,6 +456,8 @@ public class Chatroom extends javax.swing.JFrame {
         String filename = null;
         try {
             filename = file.getName();
+            writer.println(filename);
+            
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
             FileInputStream fis = null;
@@ -465,7 +467,7 @@ public class Chatroom extends javax.swing.JFrame {
                 dos.write(buffer);
             }
             buffer = null;
-            writer.print(buffer);
+            dos.write(buffer);
             dos.close();
             fis.close();
         } catch (FileNotFoundException ex) {
