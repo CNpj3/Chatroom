@@ -355,6 +355,7 @@ public class Chatroom extends javax.swing.JFrame {
     }//GEN-LAST:event_logoutActionPerformed
 
     private void changeUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUserActionPerformed
+        textArea.setText("");
         Object user = userList.getSelectedItem();
         chatUser = user.toString();
         writer.println("SEL");
