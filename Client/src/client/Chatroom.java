@@ -41,6 +41,7 @@ public class Chatroom extends javax.swing.JFrame {
         reader = new BufferedReader(streamreader);
         writer = new PrintWriter(socket.getOutputStream());
         writer.flush();
+        chatUser="";
         
         File myprofile = new File("./data/user/"+username);
         myprofile.mkdirs();
@@ -122,7 +123,7 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILESEND")) {
                         textArea.append(senderName+" is sending you file......\n");
                         filename = reader.readLine();
-                        File file = new File("./data/"+user_name.getText()+"/"+filename);
+                        File file = new File("./data/user/"+user_name.getText()+"/"+filename);
                         file.createNewFile();
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -459,7 +460,7 @@ public class Chatroom extends javax.swing.JFrame {
         try {
             filename = file.getName();
             writer.println(filename);
-            
+            writer.flush();
             byte[] buffer = new byte[1024];
             DataOutputStream dos = null;
             FileInputStream fis = null;

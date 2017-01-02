@@ -151,6 +151,7 @@ public class ServerUI extends javax.swing.JFrame {
         screen.setEditable(false);
         screen.setColumns(20);
         screen.setRows(5);
+        screen.setFocusable(false);
         jScrollPane1.setViewportView(screen);
 
         server_start_button.setText("server start");
@@ -180,6 +181,7 @@ public class ServerUI extends javax.swing.JFrame {
         online_user_plane.setRows(5);
         online_user_plane.setText("(none)");
         online_user_plane.setAutoscrolls(false);
+        online_user_plane.setFocusable(false);
         jScrollPane3.setViewportView(online_user_plane);
 
         clear_board.setText("clear");
@@ -353,10 +355,45 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                     else if(op.equals("TEXT")){
                         String message = reader.readLine();
-                        send_message(user,select_user,message);
+                        send_message(user,select_user,message);                        
                     }
-                    else if(op.equals("FILE")){
-                        transfer_file(user,select_user,reader,writer);
+                    else if(op.equals("FILEREQ")){
+                        op = reader.readLine();
+                        screen.append("file: "+op+"\n"+user+" ==> "+select_user+"\n");
+                        PrintWriter freq = new PrintWriter(user_socket.get(select_user).getOutputStream());
+                        send_protocol(user,op,freq,"FILEREQ");
+                    }
+                    else if (op.equals("FILERES")) {
+                        String filesender = reader.readLine();
+                        op = reader.readLine();
+                        screen.append(op+" (by "+user+")"+", "+filesender+" ==> "+user+"\n");
+                        PrintWriter fres = new PrintWriter(user_socket.get(filesender).getOutputStream());
+                        send_protocol(op,"",fres,"FILERES");
+                    }
+                    else if(op.equals("FILESEND")){
+                        String filename = reader.readLine();
+                        PrintWriter fsend = new PrintWriter(user_socket.get(select_user).getOutputStream());
+                        send_protocol(filename,"",fsend,"FILESEND");
+                        //transfer_file(user,select_user);
+                        ////
+                        screen.append("filename:"+filename+",before transmission...\n");
+                        if(user_status.get(select_user)){
+                            byte[] buffer = new byte[1024];
+                            DataOutputStream dos = null;
+                            DataInputStream dis = null;
+                            dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
+                            dis = new DataInputStream(client.getInputStream());
+                            while (dis.read(buffer) > 0) {
+                                dos.write(buffer);
+                            }
+                            dos.write(null);
+                            dos.close();
+                            dis.close();
+
+                        }
+                        else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
+
+                        //////
                     }
                 }
             } catch (IOException ex) {
@@ -371,41 +408,26 @@ public class ServerUI extends javax.swing.JFrame {
             return (pass.equals(user_pass.get(user)));
         }        
     }
-    public void transfer_file(String send,String receive, BufferedReader source,PrintWriter resp) throws IOException{
+    public void send_protocol(String message1, String message2, PrintWriter wr,String protocol){
+        wr.println(protocol);
+        if(!message1.equals("")) wr.println(message1);
+        if(!message2.equals("")) wr.println(message2);
+        wr.flush();
+    }
+    public void transfer_file(String send, String receive) throws IOException{
         if(user_status.get(receive)){
-            PrintWriter wr = new PrintWriter(user_socket.get(receive).getOutputStream()); 
-            InputStreamReader read_temp = new InputStreamReader(user_socket.get(receive).getInputStream());
-            BufferedReader rd = new BufferedReader(read_temp);
-            wr.println("FILE");
-            String filename = source.readLine();
-            screen.append(send+" => "+ receive +" <FILENAME= "+filename+" >\n");
-            wr.println(filename);
-            wr.flush();
-            String res = source.readLine();
-            screen.append(receive+" res = "+res+"\n");
-            if(res.equals("yes")){
-                resp.println("FILERES");
-                resp.println("yes");
-                resp.flush();
-                //file transfer start
-                byte[] buffer = new byte[1024];
-                DataOutputStream dos = null;
-                DataInputStream dis = null;
-                dos = new DataOutputStream(user_socket.get(receive).getOutputStream());
-                dis = new DataInputStream(user_socket.get(send).getInputStream());
-                while (dis.read(buffer) > 0) {
-                    dos.write(buffer);
-                }
-                dos.write(null);
-                dos.close();
-                dis.close();
-                //file transfer end
-            }            
-            else{
-                wr.println("no");
-                wr.flush(); 
-                send_message("",send, "User-><"+receive+" ><+ declined file transfer request.");
+            byte[] buffer = new byte[1024];
+            DataOutputStream dos = null;
+            DataInputStream dis = null;
+            dos = new DataOutputStream(user_socket.get(receive).getOutputStream());
+            dis = new DataInputStream(user_socket.get(send).getInputStream());
+            while (dis.read(buffer) > 0) {
+                dos.write(buffer);
             }
+            dos.write(null);
+            dos.close();
+            dis.close();
+
         }
         else send_message("",send,"User->< "+ receive +" ><- is current offline. File transfer failed.");
     }
@@ -426,15 +448,11 @@ public class ServerUI extends javax.swing.JFrame {
         message_storage(send,receive,message);
         if(user_status.get(receive)){
             PrintWriter wr = new PrintWriter(user_socket.get(receive).getOutputStream()); 
-            InputStreamReader read_temp = new InputStreamReader(user_socket.get(receive).getInputStream());
-            BufferedReader rd = new BufferedReader(read_temp);
             wr.println("MES");
             wr.println(send);
+            wr.println(send+": "+message);
             wr.flush();
-            if(rd.readLine().equals("true") || send.equals("")){//receiver acc  sender file req
-                wr.println(send+": "+message);
-                wr.flush();
-            }
+            
         }
     }
     public void send_old_message(String host, String query, PrintWriter wr) throws IOException{
