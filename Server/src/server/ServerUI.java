@@ -406,10 +406,10 @@ public class ServerUI extends javax.swing.JFrame {
         File receiver_path = new File("./data/user/"+receive+"/"+send+".txt");
         PrintWriter sender = new PrintWriter(new BufferedWriter(new FileWriter(sender_path,true)));
         PrintWriter receiver = new PrintWriter(new BufferedWriter(new FileWriter(receiver_path,true)));
-        sender.println(send+":"+message);
+        sender.println(send+": "+message);
         sender.flush();
         sender.close();
-        receiver.println(send+":"+message);
+        receiver.println(send+": "+message);
         receiver.flush();
         receiver.close();
     }
@@ -423,7 +423,7 @@ public class ServerUI extends javax.swing.JFrame {
             wr.println(send);
             wr.flush();
             if(rd.readLine().equals("true") || send.equals("")){//receiver �_���c sender��ҕ��
-                wr.println(send+":"+message);
+                wr.println(send+": "+message);
                 wr.flush();
             }
         }
