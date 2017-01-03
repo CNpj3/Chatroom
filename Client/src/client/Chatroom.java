@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.Font;
+import javax.swing.text.DefaultCaret;
 import static jdk.internal.util.xml.impl.Parser.EOS;
 
 /**
@@ -43,7 +44,8 @@ public class Chatroom extends javax.swing.JFrame {
         writer = new PrintWriter(socket.getOutputStream());
         writer.flush();
         chatUser="";
-        
+        DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         chatUser = username;
         File myprofile = new File("./data/user/"+username);
         myprofile.mkdirs();
@@ -94,16 +96,11 @@ public class Chatroom extends javax.swing.JFrame {
                         JOptionPane.showConfirmDialog(null, unreadMessage.toString());
                     }
                     else if(op.equals("FILEREQ")) {
-                    
-                        JFrame frmOpt = new JFrame();
-                        frmOpt.setVisible(true);
-                        frmOpt.setLocation(100, 100);
-                        frmOpt.setAlwaysOnTop(true);
                         
                         senderName = reader.readLine();
                         filename = reader.readLine();
                         int result=JOptionPane.showConfirmDialog(
-                                frmOpt,"Do you want to receive file '"+filename+"' from "+senderName+"?",
+                                textArea,"Do you want to receive file \n'"+filename+"'\n from "+senderName+"?",
                                 "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
                         
                         writer.println("FILERES");
@@ -137,7 +134,7 @@ public class Chatroom extends javax.swing.JFrame {
 
                             output.write(buffer, 0, bytesRead);
                             current+=bytesRead;
-                            if(current > length) break;
+                            if(current >= length) break;
                         }
                         output.close();
                         textArea.append("File '"+filename+"' downloaded (" + current+" bytes read).\n");
@@ -446,8 +443,8 @@ public class Chatroom extends javax.swing.JFrame {
     }
     
     private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed
-        if (!revOnline) {
-            JOptionPane.showMessageDialog(null, "You can't send file to a OFFLINE user.");
+        if (!revOnline || chatUser.equals(user_name.getText())) {
+            JOptionPane.showMessageDialog(textArea, "You can't send file to\n1.yourself\n2.a OFFLINE user.");
         }
         else {
             File file = chooser.getSelectedFile();
@@ -478,7 +475,7 @@ public class Chatroom extends javax.swing.JFrame {
             int count = 0;
             int current;
             while ((current = fis.read(buffer) )!= -1) {
-                dos.write(buffer);
+                dos.write(buffer,0,current);
                 count+=current;
                 //textArea.append(count+" bytes transfer..."+len+"\n");
             }

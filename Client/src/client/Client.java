@@ -145,7 +145,7 @@ public class Client extends javax.swing.JFrame {
             String isConnect = reader.readLine();
 
             if (isConnect.equals("ok")) {
-                JOptionPane.showMessageDialog(null, "You are successfully login.");
+                JOptionPane.showMessageDialog(this, "You are successfully login.");
                 send_UL_request();
                 Chatroom chatroom = new Chatroom();
                 chatroom.getAccount(socket, username, password);
@@ -154,7 +154,7 @@ public class Client extends javax.swing.JFrame {
                 chatroom.listen();
             }
             else {
-                JOptionPane.showMessageDialog(null, "Login Failed.");
+                JOptionPane.showMessageDialog(this, "Login Failed.");
             }
         }
         catch (Exception e){

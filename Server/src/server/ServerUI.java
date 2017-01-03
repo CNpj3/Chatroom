@@ -152,7 +152,6 @@ public class ServerUI extends javax.swing.JFrame {
         screen.setEditable(false);
         screen.setColumns(20);
         screen.setRows(5);
-        screen.setFocusable(false);
         jScrollPane1.setViewportView(screen);
 
         server_start_button.setText("server start");
@@ -182,7 +181,6 @@ public class ServerUI extends javax.swing.JFrame {
         online_user_plane.setRows(5);
         online_user_plane.setText("(none)");
         online_user_plane.setAutoscrolls(false);
-        online_user_plane.setFocusable(false);
         jScrollPane3.setViewportView(online_user_plane);
 
         clear_board.setText("clear");
@@ -390,7 +388,7 @@ public class ServerUI extends javax.swing.JFrame {
                             int length = Integer.parseInt(len);
                             int current =0;
                             while ((current = dis.read(buffer)) != -1 ) {                    
-                                dos.write(buffer);
+                                dos.write(buffer,0,current);
                                 part+=current;
                                 //screen.append(part+" bytes transfer..."+length+"\n");
                                 if(length <= part) break;
@@ -398,7 +396,7 @@ public class ServerUI extends javax.swing.JFrame {
                             screen.append(part+" bytes transfer...\n");
                             
                         }
-                        else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
+                        // /else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
 
                         //////
                     }
