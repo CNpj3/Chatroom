@@ -517,11 +517,17 @@ public class ServerUI extends javax.swing.JFrame {
             user_status.put(entry.getKey(),false);
         }
     }
-    
+    public void setup_data_user_users_dir(){
+        for(Map.Entry<String,String>entry: user_pass.entrySet()){
+            File path = new File("./data/user/"+entry.getKey());
+            path.mkdirs();
+        }
+    }
     private void server_start_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_server_start_buttonActionPerformed
         try {
             read_login_file();
             setup_user_status();
+            setup_data_user_users_dir();
         } catch (IOException ex) {
             Logger.getLogger(ServerUI.class.getName()).log(Level.SEVERE, null, ex);
         }
