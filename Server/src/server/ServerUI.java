@@ -11,7 +11,6 @@ import javax.swing.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.DefaultCaret;
-import static jdk.internal.util.xml.impl.Parser.EOS;
 
 /**
  *
@@ -354,51 +353,112 @@ public class ServerUI extends javax.swing.JFrame {
                     }
                     else if(op.equals("TEXT")){
                         String message = reader.readLine();
+
                         send_message(user,select_user,message);                        
                     }
                     else if(op.equals("FILEREQ")){
-                        op = reader.readLine();
-                        screen.append("file: "+op+"\n"+user+" ==> "+select_user+"\n");
-                        PrintWriter freq = new PrintWriter(user_socket.get(select_user).getOutputStream());
-                        send_protocol(user,op,freq,"FILEREQ");
+                        String number = reader.readLine();
+                        String [] filenames = new String[Integer.parseInt(number)];
+
+                        PrintWriter freq = new PrintWriter(user_socket.get(select_user).getOutputStream());                        
+                        send_protocol(user,number,"",freq,"FILEREQ");
+                        for(int i = 0; i < filenames.length; i++){
+                            filenames[i] = reader.readLine();
+                            freq.println(filenames[i]);
+                            screen.append("file["+i+"] : "+filenames[i]+"\n"+user+" ==> "+select_user+"\n");
+                        }
+                        freq.flush();
+                        //op = reader.readLine();
+                        //screen.append("file: "+op+"\n"+user+" ==> "+select_user+"\n");
                     }
                     else if (op.equals("FILERES")) {
                         String filesender = reader.readLine();
                         op = reader.readLine();
                         screen.append(op+" (by "+user+")"+", "+filesender+" ==> "+user+"\n");
+                        String path = "";
+                        if(op.equals("yes")){
+                            path = reader.readLine();
+                        }
                         PrintWriter fres = new PrintWriter(user_socket.get(filesender).getOutputStream());
-                        send_protocol(op,"",fres,"FILERES");
+                        send_protocol(op,path,"",fres,"FILERES");
                     }
                     else if(op.equals("FILESEND")){
                         String filename = reader.readLine();
                         String len = reader.readLine();
-                        PrintWriter fsend = new PrintWriter(user_socket.get(select_user).getOutputStream());
-                        send_protocol(filename,len,fsend,"FILESEND");
-                        //transfer_file(user,select_user);
-                        ////
 
-                        screen.append("filename:"+filename+",before transmission...\n");
+                  /*      
+
+                        File file = new File("./data/"+filename);
+                        file.createNewFile();
+                        screen.append("temp file '"+filename+"' "+ len+"bytes\n");
+                        FileOutputStream output = new FileOutputStream(file, false);
+                        DataInputStream in = new DataInputStream(client.getInputStream());
+                        byte[] buffer = new byte[4096];
+                        int bytesRead =0, current=0;
+                        int length = Integer.parseInt(len);
+                        int fileleft = length;
+                        while ((bytesRead = in.read(buffer,0,Math.min(4096,fileleft))) != -1 ) {
+
+                            output.write(buffer, 0, bytesRead);
+                            current+=bytesRead;
+                            fileleft -= bytesRead;
+                            if(current >= length) break;
+                        }
+                        output.flush();
+                        output.close();
+                        screen.append("temp file saved\n");
+
+                    /////////////////////////////////////////////////////
+                        PrintWriter fsend = new PrintWriter(user_socket.get(select_user).getOutputStream());
+                        send_protocol(filename,len,"",fsend,"FILESEND");
+
+                        DataOutputStream dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
+                        FileInputStream fis = new FileInputStream(file);
+
+                        int count = 0;
+                        int curr;
+                        while ((curr = fis.read(buffer) ) > 0) {
+                            dos.write(buffer,0,curr);
+                            count+=curr;
+                            //textArea.append(count+" bytes transfer..."+len+"\n");
+                        }
+                        screen.append("file:"+filename+", "+count+" bytes transfer...\n");
+                        fis.close();
+
+                        file.delete();
+
+                        */
+                        ///////////////////////////////////////////////////
+
+
+                        
+                        //transfer_file(user,select_user);
+                PrintWriter fsend = new PrintWriter(user_socket.get(select_user).getOutputStream());
+                        send_protocol(filename,len,"",fsend,"FILESEND");
+
+                        screen.append("filename:"+filename+"\nbefore transmission...\n");
                         if(user_status.get(select_user)){
-                            byte[] buffer = new byte[1024];
-                            DataOutputStream dos = null;
-                            DataInputStream dis = null;
+                            byte[] buffer = new byte[4096];
+                            DataOutputStream dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
+                            DataInputStream dis = new DataInputStream(client.getInputStream());
                             int part = 0 ;
-                            dos = new DataOutputStream(user_socket.get(select_user).getOutputStream());
-                            dis = new DataInputStream(client.getInputStream());
                             int length = Integer.parseInt(len);
                             int current =0;
-                            while ((current = dis.read(buffer)) != -1 ) {                    
+                            int fileleft =length;
+                            while ((current = dis.read(buffer,0,Math.min(4096,fileleft))) > 0 ) {                    
                                 dos.write(buffer,0,current);
                                 part+=current;
+                                fileleft -= current;
                                 //screen.append(part+" bytes transfer..."+length+"\n");
                                 if(length <= part) break;
+                                //screen.append(fileleft +" bytes left...\n");
                             }
                             screen.append(part+" bytes transfer...\n");
                             
                         }
                         // /else send_message("",user,"User->< "+ select_user +" ><- is current offline. File transfer failed.");
 
-                        //////
+                
                     }
                 }
             } catch (IOException ex) {
@@ -413,10 +473,11 @@ public class ServerUI extends javax.swing.JFrame {
             return (pass.equals(user_pass.get(user)));
         }        
     }
-    public void send_protocol(String message1, String message2, PrintWriter wr,String protocol){
+    public void send_protocol(String message1, String message2,String message3 ,PrintWriter wr,String protocol){
         wr.println(protocol);
         if(!message1.equals("")) wr.println(message1);
         if(!message2.equals("")) wr.println(message2);
+        if(!message3.equals("")) wr.println(message3);
         wr.flush();
     }
     public void transfer_file(String send, String receive) throws IOException{

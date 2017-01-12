@@ -7,14 +7,12 @@ package client;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
-import java.awt.Dimension;
 import java.awt.Font;
+import static java.lang.Thread.sleep;
 import javax.swing.text.DefaultCaret;
-import static jdk.internal.util.xml.impl.Parser.EOS;
 
 /**
  *
@@ -61,9 +59,10 @@ public class Chatroom extends javax.swing.JFrame {
                 String[] data;
                 String op;
                 String message;
-                String filename=null;
+                String[] filenames;
                 String senderName=null;
-                
+                String[] recv_file_list = null;
+                int recv_file_num = 0;
                 while((op = reader.readLine()) != null){
                     if(op.equals("UL")){
                         userList.removeAllItems();
@@ -80,33 +79,28 @@ public class Chatroom extends javax.swing.JFrame {
                             op = reader.readLine();
                         }
                     }
-                    else if(op.equals("UNREAD")) {
-                        StringBuffer unreadMessage = null;
-                        unreadMessage.append("Hello, you have unread message from ");
-                        
-                        senderName = reader.readLine();
-                        unreadMessage.append(senderName);
-                        
-                        senderName = reader.readLine();
-                        while(!(senderName.equals("\0"))){
-                            unreadMessage.append(", "+senderName);
-                            senderName = reader.readLine();
-                        }
-                        unreadMessage.append(".");
-                        JOptionPane.showConfirmDialog(null, unreadMessage.toString());
-                    }
                     else if(op.equals("FILEREQ")) {
                         
                         senderName = reader.readLine();
-                        filename = reader.readLine();
+                        String number = reader.readLine();
+                        String filename = "";
+                        filenames = new String [Integer.parseInt(number)];
+                        for(int i = 0; i < filenames.length; i++){
+                            filenames[i] = reader.readLine();
+                            filename += "'"+(new File(filenames[i])).getName()+"'" +"\n";
+                        }
+
                         int result=JOptionPane.showConfirmDialog(
-                                textArea,"Do you want to receive file \n'"+filename+"'\n from "+senderName+"?",
+                                textArea,"Do you want to receive file(s)\n "+filename+"from "+senderName+"?",
                                 "File Receive",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                        
+                        //writer.flush();
                         writer.println("FILERES");
                         writer.println(senderName);
                         if (result == JOptionPane.YES_OPTION) {
                             writer.println("yes");
+                            recv_file_list = filenames;//.clone();
+                            recv_file_num = 0;
+                            writer.println(recv_file_list[0]);                            
                         } else if (result == JOptionPane.NO_OPTION) {
                             writer.println("no");
                         } else {}    
@@ -115,29 +109,42 @@ public class Chatroom extends javax.swing.JFrame {
                     else if(op.equals("FILERES")) { 
                         message = reader.readLine();
                         if (message.equals("yes")) {
-                            send_file();
+                            String file_path = reader.readLine();
+                            send_file(file_path);
                         }
                     }
                     else if(op.equals("FILESEND")) {
                         textArea.append(senderName+" is sending you file......\n");
-                        filename = reader.readLine();
+                        String filename = reader.readLine();
                         String len = reader.readLine();
 
                         File file = new File("./data/user/"+user_name.getText()+"/"+filename);
                         file.createNewFile();
+                        textArea.append("File '"+filename+"' "+ len+"bytes\n");
                         FileOutputStream output = new FileOutputStream(file, false);
                         DataInputStream in = new DataInputStream(socket.getInputStream());
-                        byte[] buffer = new byte[1024];
+                        byte[] buffer = new byte[4096];
                         int bytesRead =0, current=0;
                         int length = Integer.parseInt(len);
-                        while ((bytesRead = in.read(buffer)) != -1 ) {
+                        int fileleft = length;
+                        while ((bytesRead = in.read(buffer,0,Math.min(4096,fileleft))) != -1 ) {
 
                             output.write(buffer, 0, bytesRead);
                             current+=bytesRead;
+                            fileleft -= bytesRead;
                             if(current >= length) break;
                         }
                         output.close();
-                        textArea.append("File '"+filename+"' downloaded (" + current+" bytes read).\n");
+                        textArea.append("downloaded (" + current+" bytes read).\n");
+
+                        recv_file_num++;
+                        if(recv_file_num < recv_file_list.length){
+                            writer.println("FILERES");
+                            writer.println(senderName);
+                            writer.println("yes");
+                            writer.println(recv_file_list[recv_file_num]);
+                            writer.flush();
+                        }
                     }
                     else if(op.equals("OLD")) {
                         message = reader.readLine();
@@ -162,6 +169,8 @@ public class Chatroom extends javax.swing.JFrame {
                     }
                 }
             } catch (IOException ex) {
+                Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -369,11 +378,23 @@ public class Chatroom extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    public String message_replace(String msg){
+        //String[] ret = new String[2];
+        msg = msg.replaceAll("fuck","****");
+        msg = msg.replaceAll("幹","*");
+        msg = msg.replaceAll("幹你媽","***");
+        msg = msg.replaceAll("幹你娘","***");
+        msg = msg.replaceAll("他媽的","***");
+        msg = msg.replaceAll("motherfucker","************");
+        msg = msg.replaceAll("你好","你怎麼不去死");
+        
+        return msg;
+    }
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
         // Send text
         writer.println("TEXT");                           
-        String message = textInput.getText();
+        String messag = textInput.getText();
+        String message = message_replace(messag);
         String username = user_name.getText();
         writer.println(message);
         writer.flush();
@@ -387,9 +408,14 @@ public class Chatroom extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "You can't send file to a OFFLINE user.");
         }
         else {
+            //chooser.setDragEnabled(true);
+            chooser.setMultiSelectionEnabled(true);
             chooser.showOpenDialog(null);
-            File file = chooser.getSelectedFile();
-            String filename = file.getAbsolutePath();
+            File[] file = chooser.getSelectedFiles();
+            String filename="";
+            for(int i = 0; i < file.length; i++){
+                filename += "\""+file[i].getAbsolutePath()+"\"";
+            }
             fileToSend.setText(filename);
         }
     }//GEN-LAST:event_chooseFileActionPerformed
@@ -447,39 +473,44 @@ public class Chatroom extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(textArea, "You can't send file to\n1.yourself\n2.a OFFLINE user.");
         }
         else {
-            File file = chooser.getSelectedFile();
-            String filename = null;
-            filename = file.getName();
+            File[] file = chooser.getSelectedFiles();
             writer.println("FILEREQ");
-            writer.println(filename);
-            writer.flush();
-
+            writer.println(Integer.toString(file.length));
+            for(int i = 0; i < file.length;i++){
+                try {
+                    writer.println(file[i].getCanonicalPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }          
+            writer.flush();    
         }
     }//GEN-LAST:event_sendFileActionPerformed
-    public void send_file() throws IOException {
+
+    public void send_file(String path) throws IOException, InterruptedException {
         writer.println("FILESEND");
-        File file = chooser.getSelectedFile();
+        //File file = chooser.getSelectedFile();
         String filename = null;
         try {
+            File file = new File(path);
             filename = file.getName();
             writer.println(filename);
             Long len = file.length();            
             writer.println(len.toString());
             writer.flush();
 
-            byte[] buffer = new byte[1024];
-            DataOutputStream dos = null;
-            FileInputStream fis = null;
-            dos = new DataOutputStream(socket.getOutputStream());
-            fis = new FileInputStream(file);
+            byte[] buffer = new byte[4096];
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            FileInputStream fis = new FileInputStream(file);
             int count = 0;
             int current;
-            while ((current = fis.read(buffer) )!= -1) {
+            sleep(100);
+            while ((current = fis.read(buffer) ) != -1) {
                 dos.write(buffer,0,current);
                 count+=current;
                 //textArea.append(count+" bytes transfer..."+len+"\n");
             }
-            textArea.append(count+" bytes transfer...\n");
+            textArea.append("file:"+filename+", "+count+" bytes transfer...\n");
             fis.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Chatroom.class.getName()).log(Level.SEVERE, null, ex);
