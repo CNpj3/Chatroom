@@ -1,2 +1,0 @@
-﻿user2: hi
-user2: 你好
