@@ -117,12 +117,12 @@ public class ClientRegister extends javax.swing.JFrame {
             String isConnect = reader.readLine();
             if (isConnect.equals("ok")) {
                 JOptionPane.showMessageDialog(null, "You are successfully registered.");
-                Client client = new Client();
+                Chatroom chatroom = new Chatroom();
                 send_UL_request();
-//                chatroom.getAccount(socket, username, password);
+                chatroom.getAccount(socket, username, password);
                 this.dispose();
-                client.setVisible(true);
-                client.listen();
+                chatroom.setVisible(true);
+                chatroom.listen();
             }
             else {
                 JOptionPane.showMessageDialog(null, "Register Failed.");
