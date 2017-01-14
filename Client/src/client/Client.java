@@ -60,7 +60,7 @@ public class Client extends javax.swing.JFrame {
             }
         });
 
-        registerButton.setText("Haven't An Accont? Register!");
+        registerButton.setText("Don't have An Account? Register!");
         registerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 registerButtonActionPerformed(evt);
@@ -162,7 +162,7 @@ public class Client extends javax.swing.JFrame {
             String isConnect = reader.readLine();
 
             if (isConnect.equals("ok")) {
-                JOptionPane.showMessageDialog(this, "You are successfully login.");
+                JOptionPane.showMessageDialog(this, "Login success.");
                 send_UL_request();
                 Chatroom chatroom = new Chatroom();
                 chatroom.getAccount(socket, username, password);
