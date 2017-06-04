@@ -1,0 +1,13 @@
+DATE,EPOCHS,SENTENCE LENGTH,NUM OF LINES, LSTM LAYER, LEARNING_RATE, NUM HIDDEN STATES,DROUPOUT PROB, BEST TRAINING ACCURACY, BEST TESTING ACCURACY, OTHERS2017.05.25,80,30,273,2,0.001,256,0,1.0,0.345455,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.25,10,30,273,2,0.001,256,0,0.7750000059604645,0.309091,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.25,6,30,273,2,0.001,256,0,0.6099999845027924,0.363636,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.25,1,30,14421,2,0.001,256,0,0.268434783362824,0.302946,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.26,3,30,14421,2,0.001,256,0,0.4663478247497393,0.45026,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.28,3,30,614,2,0.001,256,0,0.36500000208616257,0.284553,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.28,3,30,14421,2,0.001,256,0,0.29756521789923956,0.32513,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.28,5,30,14421,2,0.001,256,0,0.3022608702597411,0.320971,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.28,5,30,614,2,0.001,256,0,0.35999999940395355,0.284553,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.29,30,30,844,2,0.001,256,0,0.41999999682108563,0.313609,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.29,80,30,844,2,0.001,256,0,0.47499999900658924,0.307692,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.29,100,30,844,2,0.001,256,0,0.5300000011920929,0.325444,bidirectional: learning_rate = 0.001; AdamOptimizer
+2017.05.29,95,30,844,2,0.001,256,0,0.5333333214124044,0.331361,bidirectional: learning_rate = 0.001; AdamOptimizer
